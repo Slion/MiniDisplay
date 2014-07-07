@@ -93,3 +93,32 @@ void MiniDisplaySetBrightness(MiniDisplayDevice aDevice, int aBrightness)
 	((GP1212A01A*)aDevice)->SetBrightness(aBrightness);
 	}
 
+//-------------------------------------------------------------
+int MiniDisplayWidthInPixels(MiniDisplayDevice aDevice)
+	{
+	if (!aDevice)
+		{
+		return 0;
+		}
+
+	return ((GP1212A01A*)aDevice)->WidthInPixels();
+	}
+
+//-------------------------------------------------------------
+int MiniDisplayHeightInPixels(MiniDisplayDevice aDevice)
+	{
+	if (!aDevice)
+		{
+		return 0;
+		}
+
+	return ((GP1212A01A*)aDevice)->HeightInPixels();
+	}
+
+//-------------------------------------------------------------
+void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue)
+	{
+	//aValue&=0x00FFFFFF; //Filter out alpha component
+	return ((GP1212A01A*)aDevice)->SetPixel(aX,aY,aValue);
+	}
+
