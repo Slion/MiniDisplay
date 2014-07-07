@@ -68,6 +68,31 @@ Set device brightness level.
 */
 extern "C" MDAPI void MiniDisplaySetBrightness(MiniDisplayDevice aDevice, int aBrightness);
 
+/**
+Provide pixels width of our display.
+@param [IN] The device to apply this command to.
+@return Width in pixels.
+*/
+extern "C" MDAPI int MiniDisplayWidthInPixels(MiniDisplayDevice aDevice);
+
+/**
+Provide pixels height of our display.
+@param [IN] The device to apply this command to.
+@return Height in pixels.
+*/
+extern "C" MDAPI int MiniDisplayHeightInPixels(MiniDisplayDevice aDevice);
+
+/**
+Set our given pixel.
+@param [IN] The device to apply this command to.
+@param [IN] Pixel X coordinate.
+@param [IN] Pixel Y coordinate.
+@param [IN] Pixel value.
+*/
+extern "C" MDAPI void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue);
+
+//TODO: Have an API to specify pixel depth
+
 
 #endif
 
