@@ -22,7 +22,7 @@ MiniDisplayDevice MiniDisplayOpen()
 	}
 
 void MiniDisplayClose(MiniDisplayDevice aDevice)
-	{	
+	{
 	delete aDevice;
 	//device = NULL;
 	}
@@ -45,7 +45,7 @@ void MiniDisplayFill(MiniDisplayDevice aDevice)
 		{
 		return;
 		}
-	
+
 	((GP1212A01A*)aDevice)->SetAllPixels(0xFF);
 	}
 
@@ -56,7 +56,7 @@ void MiniDisplaySwapBuffers(MiniDisplayDevice aDevice)
 		{
 		return;
 		}
-	
+
 	((GP1212A01A*)aDevice)->SwapBuffers();
 	}
 
@@ -121,4 +121,58 @@ void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue)
 	//aValue&=0x00FFFFFF; //Filter out alpha component
 	return ((GP1212A01A*)aDevice)->SetPixel(aX,aY,aValue);
 	}
+
+//-------------------------------------------------------------
+wchar_t* MiniDisplayVendor(MiniDisplayDevice aDevice)
+    {
+    return ((GP1212A01A*)aDevice)->Vendor();
+    }
+
+//-------------------------------------------------------------
+wchar_t* MiniDisplayProduct(MiniDisplayDevice aDevice)
+    {
+    return ((GP1212A01A*)aDevice)->Product();
+    }
+
+//-------------------------------------------------------------
+wchar_t* MiniDisplaySerialNumber(MiniDisplayDevice aDevice)
+    {
+    return ((GP1212A01A*)aDevice)->SerialNumber();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayRequestDeviceId(MiniDisplayDevice aDevice)
+    {
+    ((GP1212A01A*)aDevice)->RequestDeviceId();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayRequestPowerSupplyStatus(MiniDisplayDevice aDevice)
+    {
+    ((GP1212A01A*)aDevice)->RequestPowerSupplyStatus();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayRequestFirmwareRevision(MiniDisplayDevice aDevice)
+    {
+    ((GP1212A01A*)aDevice)->RequestFirmwareRevision();
+    }
+
+//-------------------------------------------------------------
+bool MiniDisplayRequestPending(MiniDisplayDevice aDevice)
+    {
+    return ((GP1212A01A*)aDevice)->RequestPending();
+    }
+
+//-------------------------------------------------------------
+TMiniDisplayRequest MiniDisplayCurrentRequest(MiniDisplayDevice aDevice)
+    {
+    return ((GP1212A01A*)aDevice)->CurrentRequest();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayCancelRequest(MiniDisplayDevice aDevice)
+    {
+    ((GP1212A01A*)aDevice)->CancelRequest();
+    }
 

@@ -82,7 +82,7 @@ GP1212A01A::GP1212A01A():
     iFrameBeta(NULL),
     iFrameGamma(NULL),
     iNeedFullFrameUpdate(0),
-    iRequest(ERequestNone),iPowerOn(false)
+    iRequest(EMiniDisplayRequestNone),iPowerOn(false)
 	{
 	//ResetBuffers();
 	}
@@ -547,7 +547,7 @@ void GP1212A01A::RequestDeviceId()
     report[6]=0x44; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=ERequestDeviceId;
+        iRequest=EMiniDisplayRequestDeviceId;
         }
     }
 
@@ -573,7 +573,7 @@ void GP1212A01A::RequestFirmwareRevision()
     report[6]=0x52; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=ERequestFirmwareRevision;
+        iRequest=EMiniDisplayRequestFirmwareRevision;
         }
     }
 
@@ -598,7 +598,7 @@ void GP1212A01A::RequestPowerSupplyStatus()
     report[6]=0x4D; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=ERequestPowerSupplyStatus;
+        iRequest=EMiniDisplayRequestPowerSupplyStatus;
         }
     }
 
@@ -636,22 +636,22 @@ void GP1212A01A::SetOffScreenMode(bool aOn)
 
 /**
  */
-GP1212A01A::Request GP1212A01A::AttemptRequestCompletion()
+TMiniDisplayRequest GP1212A01A::AttemptRequestCompletion()
     {
     if (!RequestPending())
         {
-        return ERequestNone;
+        return EMiniDisplayRequestNone;
         }
 
     int res=Read(iInputReport);
 
     if (!res)
         {
-        return ERequestNone;
+        return EMiniDisplayRequestNone;
         }
 
     //Process our request
-    if (CurrentRequest()==GP1212A01A::ERequestPowerSupplyStatus)
+    if (CurrentRequest()==EMiniDisplayRequestPowerSupplyStatus)
         {
         if (iInputReport[1]==0x4F && iInputReport[2]==0x4E)
             {
@@ -663,9 +663,9 @@ GP1212A01A::Request GP1212A01A::AttemptRequestCompletion()
             }
         }
 
-    Request completed=iRequest;
+    TMiniDisplayRequest completed=iRequest;
     //Our request was completed
-    iRequest=ERequestNone;
+    iRequest=EMiniDisplayRequestNone;
 
     return completed;
     }

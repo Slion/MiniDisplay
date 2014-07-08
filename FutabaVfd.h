@@ -8,6 +8,7 @@
 #include "hidapi.h"
 #include "HidDevice.h"
 #include "BitArray.h"
+#include "MiniDisplay.h"
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -117,13 +118,7 @@ by themselves (from main system).
 class GP1212A01A : public GP1212XXXX
 	{
 public:
-    enum Request
-        {
-        ERequestNone,
-        ERequestDeviceId,
-        ERequestFirmwareRevision,
-        ERequestPowerSupplyStatus
-        };
+
 
 public:
     GP1212A01A();
@@ -163,10 +158,10 @@ public:
     void SetFrameDifferencing(bool aOn){iUseFrameDifferencing=aOn;}
     bool FrameDifferencing() const {return iUseFrameDifferencing;}
     //
-    bool RequestPending(){return iRequest!=ERequestNone;}
-    Request CurrentRequest(){return iRequest;}
-    void CancelRequest(){iRequest=ERequestNone;}
-    Request AttemptRequestCompletion();
+    bool RequestPending(){return iRequest!=EMiniDisplayRequestNone;}
+    TMiniDisplayRequest CurrentRequest(){return iRequest;}
+    void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
+    TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
     bool PowerOn(){return iPowerOn;}
 
@@ -208,7 +203,7 @@ private:
 	//unsigned char iFrameBeta[256*64];
 	//unsigned char *iFrontBuffer;
 	//unsigned char *iBackBuffer;
-    Request iRequest;
+    TMiniDisplayRequest iRequest;
     FutabaVfdReport iInputReport;
     bool iPowerOn;
 	};
