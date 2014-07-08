@@ -13,7 +13,7 @@ building a DLL on windows.
 */
 // We are using the Visual Studio Compiler and building Shared libraries
 
-#if defined (_WIN32) 
+#if defined (_WIN32)
   #if defined(MiniDisplay_EXPORTS)
     #define  MDAPI __declspec(dllexport)
   #else
@@ -24,6 +24,15 @@ building a DLL on windows.
 #endif
 
 typedef void* MiniDisplayDevice;
+
+typedef enum
+    {
+    EMiniDisplayRequestNone,
+    EMiniDisplayRequestDeviceId,
+    EMiniDisplayRequestFirmwareRevision,
+    EMiniDisplayRequestPowerSupplyStatus
+    }
+TMiniDisplayRequest;
 
 //Open & Close functions
 extern "C" MDAPI MiniDisplayDevice MiniDisplayOpen();
@@ -93,6 +102,66 @@ extern "C" MDAPI void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int
 
 //TODO: Have an API to specify pixel depth
 
+/**
+Provide vendor name.
+@param [IN] The device to apply this command to.
+@return Vendor name.
+*/
+extern "C" MDAPI wchar_t* MiniDisplayVendor(MiniDisplayDevice aDevice);
+
+/**
+Provide product name.
+@param [IN] The device to apply this command to.
+@return Product name.
+*/
+extern "C" MDAPI wchar_t* MiniDisplayProduct(MiniDisplayDevice aDevice);
+
+/**
+Provide Serial number.
+@param [IN] The device to apply this command to.
+@return Serial number name.
+*/
+extern "C" MDAPI wchar_t* MiniDisplaySerialNumber(MiniDisplayDevice aDevice);
+
+/**
+Request device ID.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayRequestDeviceId(MiniDisplayDevice aDevice);
+
+/**
+Request power status.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayRequestPowerSupplyStatus(MiniDisplayDevice aDevice);
+
+/**
+Request firmware version.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayRequestFirmwareRevision(MiniDisplayDevice aDevice);
+
+/**
+Tell whether or not a request is pending.
+@param [IN] The device to apply this command to.
+@return true if we have a request pending, false otherwise.
+*/
+extern "C" MDAPI bool MiniDisplayRequestPending(MiniDisplayDevice aDevice);
+
+
+/**
+Provide the current request if any.
+@param [IN] The device to apply this command to.
+@return The current request if any.
+*/
+extern "C" MDAPI TMiniDisplayRequest MiniDisplayCurrentRequest(MiniDisplayDevice aDevice);
+
+
+/**
+Cancel any pending request.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayCancelRequest(MiniDisplayDevice aDevice);
 
 #endif
 
