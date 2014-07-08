@@ -176,3 +176,20 @@ void MiniDisplayCancelRequest(MiniDisplayDevice aDevice)
     ((GP1212A01A*)aDevice)->CancelRequest();
     }
 
+//-------------------------------------------------------------
+TMiniDisplayRequest MiniDisplayAttempRequestCompletion(MiniDisplayDevice aDevice)
+	{
+	return ((GP1212A01A*)aDevice)->AttemptRequestCompletion();
+	}
+
+//-------------------------------------------------------------
+char* MiniDisplayDeviceId(MiniDisplayDevice aDevice)
+	{
+	return ((GP1212A01A*)aDevice)->DeviceId();
+	}
+
+//-------------------------------------------------------------
+char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice)
+	{
+	return ((GP1212A01A*)aDevice)->FirmwareRevision();
+	}

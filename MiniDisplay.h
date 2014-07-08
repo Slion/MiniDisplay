@@ -163,5 +163,26 @@ Cancel any pending request.
 */
 extern "C" MDAPI void MiniDisplayCancelRequest(MiniDisplayDevice aDevice);
 
+/**
+Attempt request completion.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI TMiniDisplayRequest MiniDisplayAttempRequestCompletion(MiniDisplayDevice aDevice);
+
+/**
+Provide device ID.
+@param [IN] The device to apply this command to.
+@return Device ID name.
+*/
+extern "C" MDAPI char* MiniDisplayDeviceId(MiniDisplayDevice aDevice);
+
+/**
+Provide firmware revision.
+@param [IN] The device to apply this command to.
+@return Firmware revision name.
+*/
+extern "C" MDAPI char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice);
+
+
 #endif
 

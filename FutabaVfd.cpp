@@ -84,6 +84,8 @@ GP1212A01A::GP1212A01A():
     iNeedFullFrameUpdate(0),
     iRequest(EMiniDisplayRequestNone),iPowerOn(false)
 	{
+	iDeviceId[0]=0;
+	iFirmwareRevision[0]=0;
 	//ResetBuffers();
 	}
 
@@ -662,6 +664,16 @@ TMiniDisplayRequest GP1212A01A::AttemptRequestCompletion()
             iPowerOn = false;
             }
         }
+	else if (CurrentRequest()==EMiniDisplayRequestDeviceId)
+		{
+			unsigned char* ptr=&iInputReport[1];
+			strcpy(iDeviceId,(const char*)ptr);
+		}
+	else if (CurrentRequest()==EMiniDisplayRequestFirmwareRevision)
+		{
+			unsigned char* ptr=&iInputReport[1];
+			strcpy(iFirmwareRevision,(const char*)ptr);
+		}
 
     TMiniDisplayRequest completed=iRequest;
     //Our request was completed
