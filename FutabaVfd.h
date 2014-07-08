@@ -164,6 +164,8 @@ public:
     TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
     bool PowerOn(){return iPowerOn;}
+	char* DeviceId(){return iDeviceId;};
+	char* FirmwareRevision(){return iFirmwareRevision;};
 
 private:
 	enum DW
@@ -205,6 +207,9 @@ private:
 	//unsigned char *iBackBuffer;
     TMiniDisplayRequest iRequest;
     FutabaVfdReport iInputReport;
+	//
+	char iDeviceId[KFutabaMaxHidReportSize];
+	char iFirmwareRevision[KFutabaMaxHidReportSize];
     bool iPowerOn;
 	};
 
