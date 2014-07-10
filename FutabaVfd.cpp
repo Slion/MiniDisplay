@@ -637,6 +637,7 @@ void GP1212A01A::SetOffScreenMode(bool aOn)
     }
 
 /**
+Tries to complete our current request if we have one pending.
  */
 TMiniDisplayRequest GP1212A01A::AttemptRequestCompletion()
     {
@@ -707,5 +708,27 @@ void GP1212A01A::SetBrightness(int aBrightness)
     report[7]=0x30+aBrightness; //Brightness level
     Write(report);
     }
+
+/**
+*/
+bool GP1212A01A::PowerOn()
+	{
+	return iPowerOn;
+	}
+
+/**
+*/
+char* GP1212A01A::DeviceId()
+	{
+	return iDeviceId;
+	}
+
+/**
+*/
+char* GP1212A01A::FirmwareRevision()
+	{
+	return iFirmwareRevision;
+	}
+
 
 

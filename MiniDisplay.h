@@ -167,7 +167,7 @@ extern "C" MDAPI void MiniDisplayCancelRequest(MiniDisplayDevice aDevice);
 Attempt request completion.
 @param [IN] The device to apply this command to.
 */
-extern "C" MDAPI TMiniDisplayRequest MiniDisplayAttempRequestCompletion(MiniDisplayDevice aDevice);
+extern "C" MDAPI TMiniDisplayRequest MiniDisplayAttemptRequestCompletion(MiniDisplayDevice aDevice);
 
 /**
 Provide device ID.
@@ -182,6 +182,13 @@ Provide firmware revision.
 @return Firmware revision name.
 */
 extern "C" MDAPI char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice);
+
+/**
+Get power supply status.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI bool MiniDisplayPowerSupplyStatus(MiniDisplayDevice aDevice);
+
 
 
 #endif
