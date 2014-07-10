@@ -163,9 +163,9 @@ public:
     void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
     TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
-    bool PowerOn(){return iPowerOn;}
-	char* DeviceId(){return iDeviceId;};
-	char* FirmwareRevision(){return iFirmwareRevision;};
+    bool PowerOn();
+	char* DeviceId();
+	char* FirmwareRevision();
 
 private:
 	enum DW

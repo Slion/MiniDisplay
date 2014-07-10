@@ -177,7 +177,7 @@ void MiniDisplayCancelRequest(MiniDisplayDevice aDevice)
     }
 
 //-------------------------------------------------------------
-TMiniDisplayRequest MiniDisplayAttempRequestCompletion(MiniDisplayDevice aDevice)
+TMiniDisplayRequest MiniDisplayAttemptRequestCompletion(MiniDisplayDevice aDevice)
 	{
 	return ((GP1212A01A*)aDevice)->AttemptRequestCompletion();
 	}
@@ -192,4 +192,10 @@ char* MiniDisplayDeviceId(MiniDisplayDevice aDevice)
 char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice)
 	{
 	return ((GP1212A01A*)aDevice)->FirmwareRevision();
+	}
+
+//-------------------------------------------------------------
+bool MiniDisplayPowerSupplyStatus(MiniDisplayDevice aDevice)
+	{
+	return ((GP1212A01A*)aDevice)->PowerOn();
 	}
