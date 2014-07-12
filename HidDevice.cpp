@@ -17,6 +17,14 @@ HidDevice::HidDevice():iHidDevice(NULL)
 
 /**
 */
+HidDevice::~HidDevice()
+	{
+	Close();
+	}
+
+
+/**
+*/
 int HidDevice::Open(const char* aPath)
 	{
 	Close();
@@ -55,10 +63,11 @@ int HidDevice::Open(unsigned short aVendorId, unsigned short aProductId, const w
 	}
 
 /**
+Close this HID device
 */
 void HidDevice::Close()
 	{
-	hid_close(iHidDevice);
+	hid_close(iHidDevice); //No effect if device is null
 	iHidDevice=NULL;
     //
     memset(iVendor,0,sizeof(iVendor));
