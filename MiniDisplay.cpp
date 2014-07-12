@@ -23,8 +23,7 @@ MiniDisplayDevice MiniDisplayOpen()
 
 void MiniDisplayClose(MiniDisplayDevice aDevice)
 	{
-	delete aDevice;
-	//device = NULL;
+	delete ((GP1212A01A*)aDevice);
 	}
 
 

@@ -17,6 +17,8 @@ class HidDevice
     {
 public:
     HidDevice();
+	virtual ~HidDevice();
+	//
     int Open(const char* aPath);
     int Open(unsigned short aVendorId, unsigned short aProductId, const wchar_t* aSerialNumber);
     void Close();
