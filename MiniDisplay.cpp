@@ -1,13 +1,13 @@
 
 #include "MiniDisplay.h"
-#include "FutabaVfd.h"
+#include "FutabaGP1212A01.h"
 
 
 
 
 
 //Open & Close functions
-MiniDisplayDevice MiniDisplayOpen()
+MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
 	{
 	GP1212A01A* device=NULL;
 	device=new GP1212A01A();
