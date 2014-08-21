@@ -9,6 +9,7 @@
 #include "HidDevice.h"
 #include "BitArray.h"
 #include "MiniDisplay.h"
+#include "Display.h"
 
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -31,11 +32,6 @@ const int KFutabaHidReportSizeIndex=1;
 const unsigned short KFutabaVendorId = 0x1008;
 const unsigned short KFutabaProductIdGP1212A01A = 0x100C;
 const unsigned short KFutabaProductIdGP1212A02A = 0x1013; //Or is it 0x1015
-const int KGP12xWidthInPixels = 256;
-const int KGP12xHeightInPixels = 64;
-const int KGP12xPixelsPerByte = 8;
-const int KGP12xFrameBufferSizeInBytes = KGP12xWidthInPixels*KGP12xHeightInPixels/KGP12xPixelsPerByte; //256*64/8=2048
-const int KGP12xFrameBufferPixelCount = KGP12xWidthInPixels*KGP12xHeightInPixels;
 
 //typedef struct hid_device_info HidDeviceInfo;
 
@@ -72,6 +68,16 @@ private:
     int iSize;
     int iMaxSize;
     };
+
+/**
+*/
+class FutabaGraphicDisplay : public GraphicDisplay, public HidDevice
+	{
+public:
+	//From DisplayBase
+	virtual void Close();
+
+	};
 
 
 #endif
