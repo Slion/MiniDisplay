@@ -10,10 +10,26 @@ if (MD_SHARED_LIB)
   set (LIB_TYPE SHARED)
 endif (MD_SHARED_LIB)
 
-set(SOURCES BitArray.cpp FutabaVfd.cpp HidDevice.cpp MiniDisplay.cpp ../../GitHub/hidapi/windows/hid.c)
+set(SOURCES		BitArray.cpp
+				FutabaVfd.cpp
+				FutabaGP1212.cpp
+				FutabaGP1212A01.cpp
+				FutabaGP1212A02.cpp
+				HidDevice.cpp
+				MiniDisplay.cpp
+				../../GitHub/hidapi/windows/hid.c)
+
 source_group(Souces FILES ${SOURCES})
 
-set(INCLUDES BitArray.h FutabaVfd.h HidDevice.h HidReport.h MiniDisplay.h)
+set(INCLUDES	BitArray.h
+				FutabaVfd.h
+				FutabaGP1212.h
+				FutabaGP1212A01.h
+				FutabaGP1212A02.h
+				HidDevice.h
+				HidReport.h
+				MiniDisplay.h)
+
 source_group(Includes FILES ${INCLUDES})
 
 include_directories(../../GitHub/hidapi/hidapi)

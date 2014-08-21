@@ -27,6 +27,14 @@ typedef void* MiniDisplayDevice;
 
 typedef enum
     {
+	EMiniDisplayAutoDetect=0, /*Not yet implemented*/
+    EMiniDisplayFutabaGP1212A01,
+    EMiniDisplayFutabaGP1212A02
+    }
+TMiniDisplayType;
+
+typedef enum
+    {
     EMiniDisplayRequestNone,
     EMiniDisplayRequestDeviceId,
     EMiniDisplayRequestFirmwareRevision,
@@ -35,7 +43,7 @@ typedef enum
 TMiniDisplayRequest;
 
 //Open & Close functions
-extern "C" MDAPI MiniDisplayDevice MiniDisplayOpen();
+extern "C" MDAPI MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType);
 extern "C" MDAPI void MiniDisplayClose(MiniDisplayDevice aDevice);
 
 /**
