@@ -65,7 +65,14 @@ void FutabaVfdCommand::Delete()
 */
 
 
+//
+// class FutabaDisplay
+//
 
+void FutabaGraphicDisplay::Close()
+	{
+	HidDevice::Close();
+	}
 
 
 

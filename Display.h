@@ -5,14 +5,15 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "HidDevice.h"
-
 /**
 Define an interface to some basic display functionality
 */
-class DisplayBase : public HidDevice
+class DisplayBase
 	{
 public:
+	virtual int Open()=0;
+	virtual void Close()=0;
+	//
 	virtual int MinBrightness() const=0;
 	virtual int MaxBrightness() const=0;
 	virtual void SetBrightness(int aBrightness)=0;

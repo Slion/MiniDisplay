@@ -22,11 +22,9 @@ public:
     GP1212A01A();
     ~GP1212A01A();
 
-	//
+	//From DisplayBase
 	int Open();
 	//From FutabaGraphicVfd
-    virtual int WidthInPixels() const {return KGP12xWidthInPixels;}
-    virtual int HeightInPixels() const {return KGP12xHeightInPixels;}
 	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
