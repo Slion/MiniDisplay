@@ -144,6 +144,15 @@ void GP1212A01A::Clear()
     }
 
 /**
+Turn on all pixels.
+Must be followed by a SwapBuffers call.
+*/
+void GP1212A01A::Fill()
+	{
+	SetAllPixels(0xFF);
+	}
+
+/**
 Set all pixels on our screen to the desired value.
 This operation is performed off screen to avoid tearing.
 @param 8 pixels pattern

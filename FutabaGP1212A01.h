@@ -32,6 +32,7 @@ public:
 	//From FutabaVfd
 	virtual void SetBrightness(int aBrightness);
 	virtual void Clear();
+	virtual void Fill();
 
 	//Specific to GP1212A01A
 	void SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char aValue);

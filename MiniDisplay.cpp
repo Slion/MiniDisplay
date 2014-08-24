@@ -1,29 +1,46 @@
 
 #include "MiniDisplay.h"
 #include "FutabaGP1212A01.h"
-
-
+#include "FutabaGP1212A02.h"
 
 
 
 //Open & Close functions
 MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
 	{
-	GP1212A01A* device=NULL;
-	device=new GP1212A01A();
+	GraphicDisplay* device=NULL;
+
+	switch (aType)
+		{
+	case EMiniDisplayAutoDetect:
+		//TODO
+		device=new GP1212A01A();
+		break;
+
+	case EMiniDisplayFutabaGP1212A01:
+		device=new GP1212A01A();
+		break;
+		
+	case EMiniDisplayFutabaGP1212A02:
+		device=new GP1212A02A();
+		break;
+		};
+
 	int success = device->Open();
 	if (!success)
 		{
 		delete device;
-		return NULL;
+		device=NULL;
 		}
 
 	return device;
 	}
 
+//
+
 void MiniDisplayClose(MiniDisplayDevice aDevice)
 	{
-	delete ((GP1212A01A*)aDevice);
+	delete ((GraphicDisplay*)aDevice);
 	}
 
 
@@ -34,7 +51,7 @@ void MiniDisplayClear(MiniDisplayDevice aDevice)
 		return;
 		}
 
-	((GP1212A01A*)aDevice)->SetAllPixels(0x00);
+	((GraphicDisplay*)aDevice)->Clear();
 	}
 
 
@@ -45,7 +62,7 @@ void MiniDisplayFill(MiniDisplayDevice aDevice)
 		return;
 		}
 
-	((GP1212A01A*)aDevice)->SetAllPixels(0xFF);
+	((GraphicDisplay*)aDevice)->Fill();
 	}
 
 
@@ -56,7 +73,7 @@ void MiniDisplaySwapBuffers(MiniDisplayDevice aDevice)
 		return;
 		}
 
-	((GP1212A01A*)aDevice)->SwapBuffers();
+	((GraphicDisplay*)aDevice)->SwapBuffers();
 	}
 
 //-------------------------------------------------------------
@@ -67,7 +84,7 @@ int MiniDisplayMaxBrightness(MiniDisplayDevice aDevice)
 		return 0;
 		}
 
-	return ((GP1212A01A*)aDevice)->MaxBrightness();
+	return ((GraphicDisplay*)aDevice)->MaxBrightness();
 	}
 
 //-------------------------------------------------------------
@@ -78,7 +95,7 @@ int MiniDisplayMinBrightness(MiniDisplayDevice aDevice)
 		return 0;
 		}
 
-	return ((GP1212A01A*)aDevice)->MinBrightness();
+	return ((GraphicDisplay*)aDevice)->MinBrightness();
 	}
 
 //-------------------------------------------------------------
@@ -89,7 +106,7 @@ void MiniDisplaySetBrightness(MiniDisplayDevice aDevice, int aBrightness)
 		return;
 		}
 
-	((GP1212A01A*)aDevice)->SetBrightness(aBrightness);
+	((GraphicDisplay*)aDevice)->SetBrightness(aBrightness);
 	}
 
 //-------------------------------------------------------------
@@ -100,7 +117,7 @@ int MiniDisplayWidthInPixels(MiniDisplayDevice aDevice)
 		return 0;
 		}
 
-	return ((GP1212A01A*)aDevice)->WidthInPixels();
+	return ((GraphicDisplay*)aDevice)->WidthInPixels();
 	}
 
 //-------------------------------------------------------------
@@ -111,14 +128,14 @@ int MiniDisplayHeightInPixels(MiniDisplayDevice aDevice)
 		return 0;
 		}
 
-	return ((GP1212A01A*)aDevice)->HeightInPixels();
+	return ((GraphicDisplay*)aDevice)->HeightInPixels();
 	}
 
 //-------------------------------------------------------------
 void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue)
 	{
 	//aValue&=0x00FFFFFF; //Filter out alpha component
-	return ((GP1212A01A*)aDevice)->SetPixel(aX,aY,aValue);
+	return ((GraphicDisplay*)aDevice)->SetPixel(aX,aY,aValue);
 	}
 
 //-------------------------------------------------------------
