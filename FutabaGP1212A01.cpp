@@ -21,7 +21,7 @@ GP1212A01A::GP1212A01A():
     iFrameBeta(NULL),
     iFrameGamma(NULL),
     iNeedFullFrameUpdate(0),
-    iRequest(EMiniDisplayRequestNone),iPowerOn(false)
+    iPowerOn(false)
 	{
 	iDeviceId[0]=0;
 	iFirmwareRevision[0]=0;
@@ -475,6 +475,28 @@ void GP1212A01A::ResetBuffers()
 	//memset(iFrameBeta,0x00,sizeof(iFrameBeta));
 	}
 
+
+/**
+*/
+void GP1212A01A::Request(TMiniDisplayRequest aRequest)
+	{
+	switch (aRequest)
+		{
+	case EMiniDisplayRequestDeviceId:
+		RequestDeviceId();
+		break;
+	case EMiniDisplayRequestFirmwareRevision:
+		RequestFirmwareRevision();
+		break;
+	case EMiniDisplayRequestPowerSupplyStatus:
+		RequestPowerSupplyStatus();
+		break;
+	default:
+		//Not supported
+		break;
+		};
+	}
+
 /**
 */
 void GP1212A01A::RequestDeviceId()
@@ -497,7 +519,7 @@ void GP1212A01A::RequestDeviceId()
     report[6]=0x44; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=EMiniDisplayRequestDeviceId;
+        SetRequest(EMiniDisplayRequestDeviceId);
         }
     }
 
@@ -523,7 +545,7 @@ void GP1212A01A::RequestFirmwareRevision()
     report[6]=0x52; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=EMiniDisplayRequestFirmwareRevision;
+        SetRequest(EMiniDisplayRequestFirmwareRevision);
         }
     }
 
@@ -548,7 +570,7 @@ void GP1212A01A::RequestPowerSupplyStatus()
     report[6]=0x4D; //Command ID
     if (Write(report)==report.Size())
         {
-        iRequest=EMiniDisplayRequestPowerSupplyStatus;
+        SetRequest(EMiniDisplayRequestPowerSupplyStatus);
         }
     }
 
@@ -624,9 +646,9 @@ TMiniDisplayRequest GP1212A01A::AttemptRequestCompletion()
 			strcpy(iFirmwareRevision,(const char*)ptr);
 		}
 
-    TMiniDisplayRequest completed=iRequest;
+    TMiniDisplayRequest completed=CurrentRequest();
     //Our request was completed
-    iRequest=EMiniDisplayRequestNone;
+    SetRequest(EMiniDisplayRequestNone);
 
     return completed;
     }

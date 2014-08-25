@@ -11,6 +11,7 @@ Define an interface to some basic display functionality
 class DisplayBase
 	{
 public:
+	DisplayBase():iRequest(EMiniDisplayRequestNone){}
 	virtual ~DisplayBase(){};
 	//
 	virtual int Open()=0;
@@ -23,6 +24,20 @@ public:
 	virtual void Fill()=0;
 	//
 	virtual void SwapBuffers()=0;
+
+	//Request management
+	virtual void Request(TMiniDisplayRequest /*aRequest*/){ /*No request supported by default*/ };
+	virtual TMiniDisplayRequest AttemptRequestCompletion()=0;
+	
+	virtual TMiniDisplayRequest CurrentRequest(){return iRequest;}
+    virtual void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
+	virtual bool RequestPending(){return iRequest!=EMiniDisplayRequestNone;}
+
+protected:
+	void SetRequest(TMiniDisplayRequest aRequest) { iRequest=aRequest; }
+
+private:
+	TMiniDisplayRequest iRequest;
 	};
 
 
