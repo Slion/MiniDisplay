@@ -157,21 +157,9 @@ wchar_t* MiniDisplaySerialNumber(MiniDisplayDevice aDevice)
     }
 
 //-------------------------------------------------------------
-void MiniDisplayRequestDeviceId(MiniDisplayDevice aDevice)
+void MiniDisplayRequest(MiniDisplayDevice aDevice, TMiniDisplayRequest aRequest)
     {
-    ((GP1212A01A*)aDevice)->RequestDeviceId();
-    }
-
-//-------------------------------------------------------------
-void MiniDisplayRequestPowerSupplyStatus(MiniDisplayDevice aDevice)
-    {
-    ((GP1212A01A*)aDevice)->RequestPowerSupplyStatus();
-    }
-
-//-------------------------------------------------------------
-void MiniDisplayRequestFirmwareRevision(MiniDisplayDevice aDevice)
-    {
-    ((GP1212A01A*)aDevice)->RequestFirmwareRevision();
+    ((GraphicDisplay*)aDevice)->Request(aRequest);
     }
 
 //-------------------------------------------------------------

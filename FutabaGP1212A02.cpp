@@ -22,7 +22,7 @@ GP1212A02A::GP1212A02A():
     iFrameBeta(NULL),
     iFrameGamma(NULL),
     iNeedFullFrameUpdate(0),
-    iRequest(EMiniDisplayRequestNone),iPowerOn(false)
+    iPowerOn(false)
 	{
 	iDeviceId[0]=0;
 	iFirmwareRevision[0]=0;
@@ -480,77 +480,21 @@ void GP1212A02A::ResetBuffers()
 */
 void GP1212A02A::RequestDeviceId()
     {
-    if (RequestPending())
-        {
-        //Abort silently for now
-        return;
-        }
-
-    //1BH,5BH,63H,49H,44H
-    //Send Read ID command
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=0x05; //Report length
-    report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=0x63; //Command ID
-    report[5]=0x49; //Command ID
-    report[6]=0x44; //Command ID
-    if (Write(report)==report.Size())
-        {
-        iRequest=EMiniDisplayRequestDeviceId;
-        }
+	//Not supported
     }
 
 /**
 */
 void GP1212A02A::RequestFirmwareRevision()
     {
-    if (RequestPending())
-        {
-        //Abort silently for now
-        return;
-        }
-
-    //1BH,5BH,63H,46H,52H
-    //Send Software Revision Read Command
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=0x05; //Report length
-    report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=0x63; //Command ID
-    report[5]=0x46; //Command ID
-    report[6]=0x52; //Command ID
-    if (Write(report)==report.Size())
-        {
-        iRequest=EMiniDisplayRequestFirmwareRevision;
-        }
+	//Not supported
     }
 
 /**
 */
 void GP1212A02A::RequestPowerSupplyStatus()
     {
-    if (RequestPending())
-        {
-        //Abort silently for now
-        return;
-        }
-    //1BH,5BH,63H,50H,4DH
-    //Send Power Suppply Monitor Command
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=0x05; //Report length
-    report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=0x63; //Command ID
-    report[5]=0x50; //Command ID
-    report[6]=0x4D; //Command ID
-    if (Write(report)==report.Size())
-        {
-        iRequest=EMiniDisplayRequestPowerSupplyStatus;
-        }
+	//Not supported
     }
 
 
@@ -590,47 +534,9 @@ Tries to complete our current request if we have one pending.
  */
 TMiniDisplayRequest GP1212A02A::AttemptRequestCompletion()
     {
-    if (!RequestPending())
-        {
-        return EMiniDisplayRequestNone;
-        }
-
-    int res=Read(iInputReport);
-
-    if (!res)
-        {
-        return EMiniDisplayRequestNone;
-        }
-
-    //Process our request
-    if (CurrentRequest()==EMiniDisplayRequestPowerSupplyStatus)
-        {
-        if (iInputReport[1]==0x4F && iInputReport[2]==0x4E)
-            {
-            iPowerOn = true;
-            }
-        else if (iInputReport[1]==0x4F && iInputReport[2]==0x46 && iInputReport[3]==0x46)
-            {
-            iPowerOn = false;
-            }
-        }
-	else if (CurrentRequest()==EMiniDisplayRequestDeviceId)
-		{
-			unsigned char* ptr=&iInputReport[1];
-			strcpy(iDeviceId,(const char*)ptr);
-		}
-	else if (CurrentRequest()==EMiniDisplayRequestFirmwareRevision)
-		{
-			unsigned char* ptr=&iInputReport[1];
-			strcpy(iFirmwareRevision,(const char*)ptr);
-		}
-
-    TMiniDisplayRequest completed=iRequest;
-    //Our request was completed
-    iRequest=EMiniDisplayRequestNone;
-
-    return completed;
-    }
+	//That display does not support any requests
+	return EMiniDisplayRequestNone;
+	}
 
 
 /**

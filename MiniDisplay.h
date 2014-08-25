@@ -135,19 +135,7 @@ extern "C" MDAPI wchar_t* MiniDisplaySerialNumber(MiniDisplayDevice aDevice);
 Request device ID.
 @param [IN] The device to apply this command to.
 */
-extern "C" MDAPI void MiniDisplayRequestDeviceId(MiniDisplayDevice aDevice);
-
-/**
-Request power status.
-@param [IN] The device to apply this command to.
-*/
-extern "C" MDAPI void MiniDisplayRequestPowerSupplyStatus(MiniDisplayDevice aDevice);
-
-/**
-Request firmware version.
-@param [IN] The device to apply this command to.
-*/
-extern "C" MDAPI void MiniDisplayRequestFirmwareRevision(MiniDisplayDevice aDevice);
+extern "C" MDAPI void MiniDisplayRequest(MiniDisplayDevice aDevice, TMiniDisplayRequest aRequest);
 
 /**
 Tell whether or not a request is pending.

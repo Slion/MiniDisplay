@@ -44,9 +44,7 @@ public:
     //
 	void SwapBuffers();
     //
-    void RequestDeviceId();
-    void RequestFirmwareRevision();
-    void RequestPowerSupplyStatus();
+	virtual void Request(TMiniDisplayRequest aRequest);
 	//
 	void ToggleOffScreenMode();
     void SetOffScreenMode(bool aOn);
@@ -55,14 +53,17 @@ public:
     void SetFrameDifferencing(bool aOn){iUseFrameDifferencing=aOn;}
     bool FrameDifferencing() const {return iUseFrameDifferencing;}
     //
-    bool RequestPending(){return iRequest!=EMiniDisplayRequestNone;}
-    TMiniDisplayRequest CurrentRequest(){return iRequest;}
-    void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
     TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
     bool PowerOn();
 	char* DeviceId();
 	char* FirmwareRevision();
+
+private:
+	void RequestDeviceId();
+    void RequestFirmwareRevision();
+    void RequestPowerSupplyStatus();
+
 
 private:
 	enum DW
@@ -102,7 +103,6 @@ private:
 	//unsigned char iFrameBeta[256*64];
 	//unsigned char *iFrontBuffer;
 	//unsigned char *iBackBuffer;
-    TMiniDisplayRequest iRequest;
     FutabaVfdReport iInputReport;
 	//
 	char iDeviceId[KFutabaMaxHidReportSize];
