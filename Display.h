@@ -5,13 +5,18 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+const int KMaxDisplayStringLength = 256;
+
 /**
 Define an interface to some basic display functionality
 */
 class DisplayBase
 	{
 public:
-	DisplayBase():iRequest(EMiniDisplayRequestNone){}
+	DisplayBase():iRequest(EMiniDisplayRequestNone),iPowerOn(false){	    
+	iDeviceId[0]=0;
+	iFirmwareRevision[0]=0;
+}
 	virtual ~DisplayBase(){};
 	//
 	virtual int Open()=0;
@@ -33,8 +38,18 @@ public:
     virtual void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
 	virtual bool RequestPending(){return iRequest!=EMiniDisplayRequestNone;}
 
+    virtual bool PowerOn()	{return iPowerOn;}
+	virtual char* DeviceId() {return iDeviceId;}
+	virtual char* FirmwareRevision() {return iFirmwareRevision;}
+
 protected:
 	void SetRequest(TMiniDisplayRequest aRequest) { iRequest=aRequest; }
+
+protected:
+	char iDeviceId[KMaxDisplayStringLength];
+	char iFirmwareRevision[KMaxDisplayStringLength];
+    bool iPowerOn;
+
 
 private:
 	TMiniDisplayRequest iRequest;

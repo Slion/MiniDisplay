@@ -55,9 +55,6 @@ public:
     //
     TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
-    bool PowerOn();
-	char* DeviceId();
-	char* FirmwareRevision();
 
 private:
 	void RequestDeviceId();
@@ -104,10 +101,6 @@ private:
 	//unsigned char *iFrontBuffer;
 	//unsigned char *iBackBuffer;
     FutabaVfdReport iInputReport;
-	//
-	char iDeviceId[KFutabaMaxHidReportSize];
-	char iFirmwareRevision[KFutabaMaxHidReportSize];
-    bool iPowerOn;
 	};
 
 

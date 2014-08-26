@@ -165,13 +165,13 @@ void MiniDisplayRequest(MiniDisplayDevice aDevice, TMiniDisplayRequest aRequest)
 //-------------------------------------------------------------
 bool MiniDisplayRequestPending(MiniDisplayDevice aDevice)
     {
-    return ((GP1212A01A*)aDevice)->RequestPending();
+    return ((GraphicDisplay*)aDevice)->RequestPending();
     }
 
 //-------------------------------------------------------------
 TMiniDisplayRequest MiniDisplayCurrentRequest(MiniDisplayDevice aDevice)
     {
-    return ((GP1212A01A*)aDevice)->CurrentRequest();
+    return ((GraphicDisplay*)aDevice)->CurrentRequest();
     }
 
 //-------------------------------------------------------------
@@ -183,23 +183,23 @@ void MiniDisplayCancelRequest(MiniDisplayDevice aDevice)
 //-------------------------------------------------------------
 TMiniDisplayRequest MiniDisplayAttemptRequestCompletion(MiniDisplayDevice aDevice)
 	{
-	return ((GP1212A01A*)aDevice)->AttemptRequestCompletion();
+	return ((GraphicDisplay*)aDevice)->AttemptRequestCompletion();
 	}
 
 //-------------------------------------------------------------
 char* MiniDisplayDeviceId(MiniDisplayDevice aDevice)
 	{
-	return ((GP1212A01A*)aDevice)->DeviceId();
+	return ((GraphicDisplay*)aDevice)->DeviceId();
 	}
 
 //-------------------------------------------------------------
 char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice)
 	{
-	return ((GP1212A01A*)aDevice)->FirmwareRevision();
+	return ((GraphicDisplay*)aDevice)->FirmwareRevision();
 	}
 
 //-------------------------------------------------------------
 bool MiniDisplayPowerSupplyStatus(MiniDisplayDevice aDevice)
 	{
-	return ((GP1212A01A*)aDevice)->PowerOn();
+	return ((GraphicDisplay*)aDevice)->PowerOn();
 	}
