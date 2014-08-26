@@ -28,7 +28,9 @@ set(INCLUDES	BitArray.h
 				FutabaGP1212A02.h
 				HidDevice.h
 				HidReport.h
-				MiniDisplay.h)
+				MiniDisplay.h
+				Display.h
+				)
 
 source_group(Includes FILES ${INCLUDES})
 
