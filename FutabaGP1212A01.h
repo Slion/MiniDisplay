@@ -28,7 +28,7 @@ public:
 	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
-    virtual void BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const;
+    //virtual void BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const;
 	//From FutabaVfd
 	virtual void SetBrightness(int aBrightness);
 	virtual void Clear();
@@ -88,13 +88,13 @@ private:
 	//FutabaVfdReport iReport;
 	///
 	//unsigned char iFrameBuffer[256*64];
-    BitArray* iFrameNext;
-    BitArray* iFrameCurrent;
-    BitArray* iFramePrevious;
+    BitArrayHigh* iFrameNext;
+    BitArrayHigh* iFrameCurrent;
+    BitArrayHigh* iFramePrevious;
     //
-    BitArray* iFrameAlpha;
-    BitArray* iFrameBeta;
-    BitArray* iFrameGamma;
+    BitArrayHigh* iFrameAlpha;
+    BitArrayHigh* iFrameBeta;
+    BitArrayHigh* iFrameGamma;
     //
     int iNeedFullFrameUpdate;
 	//unsigned char iFrameBeta[256*64];

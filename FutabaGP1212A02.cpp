@@ -59,15 +59,15 @@ int GP1212A02A::Open()
         //Allocate both frames
         delete iFrameAlpha;
         iFrameAlpha=NULL;
-        iFrameAlpha=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameAlpha=new BitArrayLow(KGP12xFrameBufferPixelCount);
         //
         delete iFrameBeta;
         iFrameBeta=NULL;
-        iFrameBeta=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameBeta=new BitArrayLow(KGP12xFrameBufferPixelCount);
         //
         delete iFrameGamma;
         iFrameGamma=NULL;
-        iFrameGamma=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameGamma=new BitArrayLow(KGP12xFrameBufferPixelCount);
         //
         iFrameNext=iFrameAlpha;
         iFrameCurrent=iFrameBeta;
@@ -78,10 +78,8 @@ int GP1212A02A::Open()
         iNeedFullFrameUpdate=0;
         //
 		SetNonBlocking(1);
-        //Since we can't get our display position we force it to our default
-		//This makes sure frames are in sync from the start
-        //Clever clients will have taken care of putting back frame (0,0) before closing
-		SetDisplayPosition(iDisplayPositionX,iDisplayPositionY);
+		//
+		SendClearCommand();
 		}
 	return success;
 	}
@@ -109,12 +107,13 @@ void GP1212A02A::SetPixel(unsigned char aX, unsigned char aY, bool aOn)
     else
         {
         //Just specify a one pixel block
-        SetPixelBlock(aX,aY,0x00,0x01,aOn);
+        //TODO
         }
 	}
 
 /**
 */
+/*
 void GP1212A02A::BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const
 	{
 	//TODO: amend loop values so that we don't keep on looping past our frame buffer dimensions.
@@ -126,6 +125,7 @@ void GP1212A02A::BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight,
 			}
 		}
 	}
+*/
 
 /**
 Clear our client side back buffer.
@@ -173,74 +173,31 @@ void GP1212A02A::SetAllPixels(unsigned char aPattern)
     else
         {
         //Using pattern SetPixelBlock variant.
-        SetPixelBlock(0,0,63,FrameBufferSizeInBytes(),aPattern);
+        //TODO
         }
 	//
 	}
 
 
+
+
 /**
-Set the defined pixel block to the given value.
-@param X coordinate of our pixel block starting point.
-@param Y coordinate of our pixel block starting point.
-@param The height of our pixel block.
-@param The size of our pixel data. Number of pixels divided by 8.
-@param The value set to 8 pixels used as a pattern.
+Using this function is advised against as is causes tearing.
+Use Clear instead.
 */
-void GP1212A02A::SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char aValue)
-	{
-	OffScreenTranslation(aX,aY);
-    FutabaVfdReport report;
+void GP1212A02A::SetFrame(int aSize, unsigned char* aPixels)
+{
+	FutabaVfdReport report;
     report[0]=0x00; //Report ID
     report[1]=(aSize<=report.Size()-10?aSize+0x08:64); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size
     report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=0xF0; //Command ID
-    report[5]=aX;   //X
-    report[6]=aY;   //Y
-    report[7]=aHeight; //Y length before return. Though outside the specs, setting this to zero apparently allows us to modify a single pixel without touching any other.
-	report[8]=aSize>>8; //Size of pixel data in bytes (MSB)
-	report[9]=aSize;	//Size of pixel data in bytes (LSB)
-    int sizeWritten=MIN(aSize,report.Size()-10);
-    memset(report.Buffer()+10, aValue, sizeWritten);
-    Write(report);
-
-    int remainingSize=aSize;
-    //We need to keep on sending our pixel data until we are done
-    while (report[1]==64)
-        {
-        report.Reset();
-        remainingSize-=sizeWritten;
-        report[0]=0x00; //Report ID
-        report[1]=(remainingSize<=report.Size()-2?remainingSize:64); //Report length, should be 64 or the remaining size
-        sizeWritten=(report[1]==64?63:report[1]);
-        memset(report.Buffer()+2, aValue, sizeWritten);
-        Write(report);
-        }
-	}
-
-/**
-Set the defined pixel block to the given value.
-@param X coordinate of our pixel block starting point.
-@param Y coordinate of our pixel block starting point.
-@param The height of our pixel block.
-@param The size of our pixel data. Number of pixels divided by 8.
-@param Pointer to our pixel data.
-*/
-void GP1212A02A::SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char* aPixels)
-    {
-	OffScreenTranslation(aX,aY);
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=(aSize<=report.Size()-10?aSize+0x08:64); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size
-    report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=0xF0; //Command ID
-    report[5]=aX;   //X
-    report[6]=aY;   //Y
-    report[7]=aHeight; //Y length before return. Though outside the specs, setting this to zero apparently allows us to modify a single pixel without touching any other.
-	report[8]=aSize>>8; //Size of pixel data in bytes (MSB)
-	report[9]=aSize;	//Size of pixel data in bytes (LSB)
+    report[3]=0x4A; //Command ID
+    report[4]=0x30; //DW Display Window
+    report[5]=0x00; //aL = DW lower byte
+    report[6]=0x00; //aH = DW upper byte
+    report[7]=0x30; //Direction of writing: Y
+	report[8]=aSize; //Size of pixel data in bytes (LSB)
+	report[9]=aSize>>8;	//Size of pixel data in bytes (MSB)
     int sizeWritten=MIN(aSize,report.Size()-10);
     memcpy(report.Buffer()+10, aPixels, sizeWritten);
     Write(report);
@@ -257,7 +214,7 @@ void GP1212A02A::SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, 
         memcpy(report.Buffer()+2, aPixels+(aSize-remainingSize), sizeWritten);
         Write(report);
         }
-    }
+}
 
 /**
 Using this function is advised against as is causes tearing.
@@ -265,48 +222,18 @@ Use Clear instead.
 */
 void GP1212A02A::SendClearCommand()
 	{
-    //1BH,5BH,32H,4AH
+    //1BH,4AH,43H,44H
     //Send Clear Display Command
 	FutabaVfdReport report;
 	report[0]=0x00; //Report ID
 	report[1]=0x04; //Report length
 	report[2]=0x1B; //Command ID
-	report[3]=0x5B; //Command ID
-	report[4]=0x32; //Command ID
-	report[5]=0x4A; //Command ID
+	report[3]=0x4A; //Command ID
+	report[4]=0x43; //Command ID
+	report[5]=0x44; //Command ID
 	Write(report);
 	}
 
-/**
-Change our display position within our buffer.
-*/
-void GP1212A02A::SetDisplayPosition(DW aDw,unsigned char aX, unsigned char aY)
-    {
-    //1BH,5BH,Dw,Px,Py
-    //Send Display Position Settings Command
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=0x05; //Report length
-    report[2]=0x1B; //Command ID
-    report[3]=0x5B; //Command ID
-    report[4]=aDw;  //Specify our DW
-    report[5]=aX;   //X coordinate of our DW top-left corner
-    report[6]=aY;   //Y coordinate of our DW top-left corner
-    Write(report);
-    }
-
-/**
-Change our display position within our buffer.
-*/
-void GP1212A02A::SetDisplayPosition(unsigned char aX, unsigned char aY)
-	{
-	//Specs apparently says both DW should remain the same
-	//Just don't ask
-    SetDisplayPosition(GP1212A02A::DW1,aX,aY);
-    SetDisplayPosition(GP1212A02A::DW2,aX,aY);
-	iDisplayPositionX=aX;
-	iDisplayPositionY=aY;
-	}
 
 /**
 Provide Y coordinate of our off screen buffer.
@@ -327,26 +254,14 @@ void GP1212A02A::SwapBuffers()
 	if (OffScreenMode())
 		{
 		//Send host back buffer to device back buffer
-        if (!iUseFrameDifferencing || iNeedFullFrameUpdate<KNumberOfFrameBeforeDiffAlgo)
-            {
-            iNeedFullFrameUpdate++;
-            SetPixelBlock(0,0,63,FrameBufferSizeInBytes(),iFrameNext->Ptr());
-            }
-        else
-            {
-            //Frame diff algo is enabled
-            //We are going to send to our device only the differences between next frame and previous frame
-            SendModifiedPixelBlocks();
-            }
-		//Swap device front and back buffer
-		SetDisplayPosition(iDisplayPositionX,OffScreenY());
+		SetFrame(FrameBufferSizeInBytes(),iFrameNext->Ptr());
 
         //Cycle through our frame buffers
         //We keep track of previous frame which is in fact our device back buffer.
         //We can then compare previous and next frame and send only the differences to our device.
         //This mechanism allows us to reduce traffic over our USB bus thus improving our frame rate from 14 FPS to 30 FPS.
         //Keep our previous frame pointer
-        BitArray* previousFrame=iFramePrevious;
+        BitArrayLow* previousFrame=iFramePrevious;
         //Current frame becomes the previous one
         iFramePrevious = iFrameCurrent;
         //Next frame becomes the current one
@@ -364,95 +279,6 @@ const int KPixelBlockEdge = 32;
 const int KPixelBlockSizeInBits = KPixelBlockEdge*KPixelBlockEdge;
 const int KPixelBlockSizeInBytes = KPixelBlockSizeInBits/8;
 
-
-/**
- * @brief GP1212A02A::SendModifiedPixelBlocks
- * Compare our back and front buffer and send to the device only the modified pixels.
- */
-void GP1212A02A::SendModifiedPixelBlocks()
-    {
-    int w=WidthInPixels();
-    int h=HeightInPixels();
-
-
-    //TODO: optimize with memcmp and 16 inc
-    /*
-
-    for (int i=0;i<w;i++)
-        {
-        for (int j=0;j<h;j++)
-            {
-            //aX*HeightInPixels()+aY
-            if ((*iFrameNext)[i*h+j]!=(*iFramePrevious)[i*h+j])
-                {
-                //We need to update that pixel
-                SetPixelBlock(i,j,0,1,((*iFrameNext)[i*h+j]?0x01:0x00));
-                //SetDisplayPosition(iDisplayPositionX,OffScreenY());
-                //SetDisplayPosition(iDisplayPositionX,OffScreenY());
-
-                //SetPixelBlock(i,j,15,32,iNextFrame->Ptr()+offset);
-                }
-            }
-        }
-    */
-
-    BitArray nextBlock(KPixelBlockSizeInBits);
-    BitArray previousBlock(KPixelBlockSizeInBits);
-
-    for (int i=0;i<w;i+=KPixelBlockEdge)
-        {
-        for (int j=0;j<h;j+=KPixelBlockEdge)
-            {
-            //aX*HeightInPixels()+aY
-            //int offset=(i*w/8)+(j/8);
-
-#ifdef DEBUG_FRAME_DIFF
-            QImage imagePrevious(KPixelBlockEdge,KPixelBlockEdge,QImage::Format_RGB32);
-            QImage imageNext(KPixelBlockEdge,KPixelBlockEdge,QImage::Format_RGB32);
-#endif
-
-            //Get both our blocks from our buffers
-            for (int x=i;x<i+KPixelBlockEdge;x++)
-                {
-                for (int y=j;y<j+KPixelBlockEdge;y++)
-                    {
-                    int blockOffset=(x-i)*KPixelBlockEdge+(y-j);
-                    int frameOffset=x*h+y;
-                    nextBlock.SetBitValue(blockOffset,(*iFrameNext)[frameOffset]);
-                    previousBlock.SetBitValue(blockOffset,(*iFramePrevious)[frameOffset]);
-
-#ifdef DEBUG_FRAME_DIFF
-                    imageNext.setPixel(x-i,y-j,(nextBlock[blockOffset]?0xFFFFFFFF:0x00000000));
-                    imagePrevious.setPixel(x-i,y-j,(previousBlock[blockOffset]?0xFFFFFFFF:0x00000000));
-#endif
-                    }
-                }
-
-#ifdef DEBUG_FRAME_DIFF
-            QString previousName;
-            QString nextName;
-            QTextStream(&previousName) << "p" << i << "x" << j << ".png";
-            QTextStream(&nextName) << "n" << i << "x" << j << ".png";
-            imagePrevious.save(previousName);
-            imageNext.save(nextName);
-#endif
-
-
-            //if (memcmp(iFrameNext->Ptr()+offset,iFramePrevious->Ptr()+offset,32 )) //32=(16*16/8)
-            if (memcmp(nextBlock.Ptr(),previousBlock.Ptr(),KPixelBlockSizeInBytes)!=0)
-                {
-                //We need to update that block
-                SetPixelBlock(i,j,KPixelBlockEdge-1,KPixelBlockSizeInBytes,nextBlock.Ptr());
-                //SetPixelBlock(i,j,15,32,0xFF/*nextBlock.Ptr()*/);
-                //SetDisplayPosition(iDisplayPositionX,OffScreenY());
-                //SetDisplayPosition(iDisplayPositionX,OffScreenY());
-
-                //SetPixelBlock(i,j,15,32,iFrameNext->Ptr()+offset);
-                }
-            }
-        }
-
-    }
 
 /**
 Translate the given pixel coordinate according to our off screen mode.
@@ -523,7 +349,6 @@ void GP1212A02A::SetOffScreenMode(bool aOn)
     iOffScreenMode=aOn;
 
     //Clean up our buffers upon switching modes
-    SetDisplayPosition(0,0);
     Clear();
     SwapBuffers();
     Clear();
@@ -558,7 +383,7 @@ void GP1212A02A::SetBrightness(int aBrightness)
     report[2]=0x1B; //Command ID
     report[3]=0x4A; //Command ID
     report[4]=0x44; //Command ID
-    report[7]=0x30+aBrightness; //Brightness level
+    report[5]=0x30+aBrightness; //Brightness level
     Write(report);
     }
 

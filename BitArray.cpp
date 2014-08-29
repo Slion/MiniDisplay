@@ -102,8 +102,12 @@ using namespace std;
 /* array index for character containing bit */
 //SL: We had to change that macro since bits in our frame buffer are the other way around
 //TODO: Find a solution to tackle that problem
+
+//Bits are indexed: 01234567
 //#define BIT_IN_CHAR(bit)      (1 << (CHAR_BIT - 1 - ((bit)  % CHAR_BIT)))
-#define BIT_IN_CHAR(bit)      (1 << (((bit)  % CHAR_BIT)))
+
+//Bits are indexed: 76543210
+//#define BIT_IN_CHAR(bit)      (1 << (((bit)  % CHAR_BIT)))
 
 /* number of characters required to contain number of bits */
 #define BITS_TO_CHARS(bits)   ((((bits) - 1) / CHAR_BIT) + 1)
@@ -123,7 +127,8 @@ using namespace std;
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-BitArray::BitArray(const int numBits):
+template <TBitInChar F>
+BitArray<F>::BitArray(const int numBits):
     m_NumBits(numBits),
     m_Array(NULL),
     m_OwnsBuffer(true)
@@ -148,7 +153,8 @@ BitArray::BitArray(const int numBits):
 *   Effects    : Allocates vectory for array bits
 *   Returned   : None
 ***************************************************************************/
-BitArray::BitArray(unsigned char *array, const int numBits,bool aOwnsBuffer):
+template <TBitInChar F>
+BitArray<F>::BitArray(unsigned char *array, const int numBits,bool aOwnsBuffer):
     m_NumBits(numBits),
     m_Array(array),
     m_OwnsBuffer(aOwnsBuffer)
@@ -164,7 +170,8 @@ BitArray::BitArray(unsigned char *array, const int numBits,bool aOwnsBuffer):
 *   Effects    : None
 *   Returned   : None
 ***************************************************************************/
-BitArray::~BitArray(void)
+template <TBitInChar F>
+BitArray<F>::~BitArray(void)
 {
     if (m_OwnsBuffer)
     {
@@ -182,7 +189,8 @@ BitArray::~BitArray(void)
 *   Effects    : Array contents are dumped to stdout
 *   Returned   : None
 ***************************************************************************/
-void BitArray::Dump(std::ostream &outStream)
+template <TBitInChar F>
+void BitArray<F>::Dump(std::ostream &outStream)
 {
     int size;
 
@@ -216,7 +224,8 @@ void BitArray::Dump(std::ostream &outStream)
 *                Unused (spare) bits are set to 0.
 *   Returned   : None
 ***************************************************************************/
-void BitArray::SetAll(void)
+template <TBitInChar F>
+void BitArray<F>::SetAll(void)
 {
     int bits, size;
     unsigned char mask;
@@ -242,7 +251,8 @@ void BitArray::SetAll(void)
 *   Effects    : Each of the bits in the bit array are set to 0.
 *   Returned   : None
 ***************************************************************************/
-void BitArray::ClearAll(void)
+template <TBitInChar F>
+void BitArray<F>::ClearAll(void)
 {
     int size;
 
@@ -259,19 +269,21 @@ void BitArray::ClearAll(void)
 *   Effects    : The specified bit will be set to 1.
 *   Returned   : None
 ***************************************************************************/
-void BitArray::SetBit(const unsigned int bit)
+template <TBitInChar F>
+void BitArray<F>::SetBit(const unsigned int bit)
 {
     if (m_NumBits <= bit)
     {
         return;         /* bit out of range */
     }
 
-    m_Array[BIT_CHAR(bit)] |= BIT_IN_CHAR(bit);
+    m_Array[BIT_CHAR(bit)] |= F(bit);
 }
 
 /**
 */
-void BitArray::SetBitValue(const unsigned int bit, bool aValue)
+template <TBitInChar F>
+void BitArray<F>::SetBitValue(const unsigned int bit, bool aValue)
 	{
 	if (aValue)
 		{
@@ -290,7 +302,8 @@ void BitArray::SetBitValue(const unsigned int bit, bool aValue)
 *   Effects    : The specified bit will be set to 0.
 *   Returned   : None
 ***************************************************************************/
-void BitArray::ClearBit(const unsigned int bit)
+template <TBitInChar F>
+void BitArray<F>::ClearBit(const unsigned int bit)
 {
     unsigned char mask;
 
@@ -300,7 +313,7 @@ void BitArray::ClearBit(const unsigned int bit)
     }
 
     /* create a mask to zero out desired bit */
-    mask =  BIT_IN_CHAR(bit);
+    mask =  F(bit);
     mask = ~mask;
 
     m_Array[BIT_CHAR(bit)] &= mask;
@@ -316,9 +329,10 @@ void BitArray::ClearBit(const unsigned int bit)
 *   Effects    : None
 *   Returned   : bit_array_index_c (pointer to bit)
 ***************************************************************************/
-BitArrayIndex BitArray::operator()(const unsigned int bit)
+template <TBitInChar F>
+BitArrayIndex<F> BitArray<F>::operator()(const unsigned int bit)
 {
-    BitArrayIndex result(this, bit);
+    BitArrayIndex<F> result(this, bit);
 
     return result;
 }
@@ -331,9 +345,10 @@ BitArrayIndex BitArray::operator()(const unsigned int bit)
 *   Effects    : None
 *   Returned   : The value of the specified bit.
 ***************************************************************************/
-bool BitArray::operator[](const unsigned int bit) const
+template <TBitInChar F>
+bool BitArray<F>::operator[](const unsigned int bit) const
 {
-    return((m_Array[BIT_CHAR(bit)] & BIT_IN_CHAR(bit)) != 0);
+    return((m_Array[BIT_CHAR(bit)] & F(bit)) != 0);
 }
 
 /***************************************************************************
@@ -343,7 +358,8 @@ bool BitArray::operator[](const unsigned int bit) const
 *   Effects    : None
 *   Returned   : True if this == other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator==(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator==(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -361,7 +377,8 @@ bool BitArray::operator==(const BitArray &other) const
 *   Effects    : None
 *   Returned   : True if this != other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator!=(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator!=(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -379,7 +396,8 @@ bool BitArray::operator!=(const BitArray &other) const
 *   Effects    : None
 *   Returned   : True if this < other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator<(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator<(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -397,7 +415,8 @@ bool BitArray::operator<(const BitArray &other) const
 *   Effects    : None
 *   Returned   : True if this <= other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator<=(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator<=(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -415,7 +434,8 @@ bool BitArray::operator<=(const BitArray &other) const
 *   Effects    : None
 *   Returned   : True if this > other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator>(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator>(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -433,7 +453,8 @@ bool BitArray::operator>(const BitArray &other) const
 *   Effects    : None
 *   Returned   : True if this >= other.  Otherwise false.
 ***************************************************************************/
-bool BitArray::operator>=(const BitArray &other) const
+template <TBitInChar F>
+bool BitArray<F>::operator>=(const BitArray &other) const
 {
     if (m_NumBits != other.m_NumBits)
     {
@@ -452,7 +473,8 @@ bool BitArray::operator>=(const BitArray &other) const
 *   Effects    : None
 *   Returned   : value of this after bitwise not
 ***************************************************************************/
-BitArray BitArray::operator~(void) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator~(void) const
 {
     BitArray result(this->m_NumBits);
     result = *this;
@@ -469,9 +491,10 @@ BitArray BitArray::operator~(void) const
 *   Effects    : None
 *   Returned   : value of bitwise and of this and other.
 ***************************************************************************/
-BitArray BitArray::operator&(const BitArray &other) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator&(const BitArray<F> &other) const
 {
-    BitArray result(this->m_NumBits);
+    BitArray<F> result(this->m_NumBits);
     result = *this;
     result &= other;
 
@@ -487,9 +510,10 @@ BitArray BitArray::operator&(const BitArray &other) const
 *   Effects    : None
 *   Returned   : value of bitwise xor of this and other.
 ***************************************************************************/
-BitArray BitArray::operator^(const BitArray &other) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator^(const BitArray<F> &other) const
 {
-    BitArray result(this->m_NumBits);
+    BitArray<F> result(this->m_NumBits);
     result = *this;
     result ^= other;
 
@@ -504,9 +528,10 @@ BitArray BitArray::operator^(const BitArray &other) const
 *   Effects    : None
 *   Returned   : value of bitwise or of this and other.
 ***************************************************************************/
-BitArray BitArray::operator|(const BitArray &other) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator|(const BitArray<F> &other) const
 {
-    BitArray result(this->m_NumBits);
+    BitArray<F> result(this->m_NumBits);
     result = *this;
     result |= other;
 
@@ -521,9 +546,10 @@ BitArray BitArray::operator|(const BitArray &other) const
 *   Effects    : None
 *   Returned   : result of bitwise left shift
 ***************************************************************************/
-BitArray BitArray::operator<<(const unsigned int count) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator<<(const unsigned int count) const
 {
-    BitArray result(this->m_NumBits);
+    BitArray<F> result(this->m_NumBits);
     result = *this;
     result <<= count;
 
@@ -538,9 +564,10 @@ BitArray BitArray::operator<<(const unsigned int count) const
 *   Effects    : None
 *   Returned   : result of bitwise right shift
 ***************************************************************************/
-BitArray BitArray::operator>>(const unsigned int count) const
+template <TBitInChar F>
+BitArray<F> BitArray<F>::operator>>(const unsigned int count) const
 {
-    BitArray result(this->m_NumBits);
+    BitArray<F> result(this->m_NumBits);
     result = *this;
     result >>= count;
 
@@ -555,7 +582,8 @@ BitArray BitArray::operator>>(const unsigned int count) const
 *   Effects    : Bit array contents are incremented
 *   Returned   : Reference to this array after increment
 ***************************************************************************/
-BitArray& BitArray::operator++(void)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator++(void)
 {
     int i;
     unsigned char maxValue;     /* maximum value for current char */
@@ -608,7 +636,8 @@ BitArray& BitArray::operator++(void)
 *   Effects    : Bit array contents are incremented
 *   Returned   : Reference to this array after increment
 ***************************************************************************/
-BitArray& BitArray::operator++(int dummy)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator++(int dummy)
 {
     ++(*this);
     return *this;
@@ -622,7 +651,8 @@ BitArray& BitArray::operator++(int dummy)
 *   Effects    : Bit array contents are decremented
 *   Returned   : None
 ***************************************************************************/
-BitArray& BitArray::operator--(void)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator--(void)
 {
     int i;
     unsigned char maxValue;     /* maximum value for current char */
@@ -675,7 +705,8 @@ BitArray& BitArray::operator--(void)
 *   Effects    : Bit array contents are decremented
 *   Returned   : None
 ***************************************************************************/
-BitArray& BitArray::operator--(int dummy)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator--(int dummy)
 {
     --(*this);
     return *this;
@@ -689,7 +720,8 @@ BitArray& BitArray::operator--(int dummy)
 *   Effects    : Source bit array contents are copied into this array
 *   Returned   : Reference to this array after copy
 ***************************************************************************/
-BitArray& BitArray::operator=(const BitArray &src)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator=(const BitArray<F> &src)
 {
     if (*this == src)
     {
@@ -726,7 +758,8 @@ BitArray& BitArray::operator=(const BitArray &src)
 *   Effects    : Results of bitwise and are stored in this array
 *   Returned   : Reference to this array after and
 ***************************************************************************/
-BitArray& BitArray::operator&=(const BitArray &src)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator&=(const BitArray<F> &src)
 {
     int size;
 
@@ -756,7 +789,8 @@ BitArray& BitArray::operator&=(const BitArray &src)
 *   Effects    : Results of bitwise xor are stored in this array
 *   Returned   : Reference to this array after xor
 ***************************************************************************/
-BitArray& BitArray::operator^=(const BitArray &src)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator^=(const BitArray<F> &src)
 {
     int size;
 
@@ -786,7 +820,8 @@ BitArray& BitArray::operator^=(const BitArray &src)
 *   Effects    : Results of bitwise or are stored in this array
 *   Returned   : Reference to this array after or
 ***************************************************************************/
-BitArray& BitArray::operator|=(const BitArray &src)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator|=(const BitArray<F> &src)
 {
     int size;
 
@@ -815,7 +850,8 @@ BitArray& BitArray::operator|=(const BitArray &src)
 *                left at 0.
 *   Returned   : Reference to this array after not
 ***************************************************************************/
-BitArray& BitArray::Not(void)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::Not(void)
 {
     int bits;
     unsigned char mask;
@@ -854,7 +890,8 @@ BitArray& BitArray::Not(void)
 *   Effects    : Results of the shifts are stored in this array
 *   Returned   : Reference to this array after shift
 ***************************************************************************/
-BitArray& BitArray::operator<<=(const unsigned int shifts)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator<<=(const unsigned int shifts)
 {
     int i;
     int chars = shifts / CHAR_BIT; /* number of whole byte shifts */
@@ -913,7 +950,8 @@ BitArray& BitArray::operator<<=(const unsigned int shifts)
 *   Effects    : Results of the shifts are stored in this array
 *   Returned   : Reference to this array after shift
 ***************************************************************************/
-BitArray& BitArray::operator>>=(const unsigned int shifts)
+template <TBitInChar F>
+BitArray<F>& BitArray<F>::operator>>=(const unsigned int shifts)
 {
     int i;
     char mask;
@@ -981,7 +1019,8 @@ BitArray& BitArray::operator>>=(const unsigned int shifts)
 *   Effects    : Pointer to bit array and bit index are stored.
 *   Returned   : None
 ***************************************************************************/
-BitArrayIndex::BitArrayIndex(BitArray *array,
+template <TBitInChar F>
+BitArrayIndex<F>::BitArrayIndex(BitArray<F> *array,
     const unsigned int index)
 {
     m_BitArray = array;
@@ -997,7 +1036,8 @@ BitArrayIndex::BitArrayIndex(BitArray *array,
 *                source.
 *   Returned   : None
 ***************************************************************************/
-void BitArrayIndex::operator=(const bool src)
+template <TBitInChar F>
+void BitArrayIndex<F>::operator=(const bool src)
 {
     if (m_BitArray == NULL)
     {
@@ -1018,3 +1058,9 @@ void BitArrayIndex::operator=(const bool src)
         m_BitArray->ClearBit(m_Index);
     }
 }
+
+
+template class BitArray<HighBitHighIndex>;
+template class BitArray<HighBitLowIndex>;
+template class BitArrayIndex<HighBitHighIndex>;
+template class BitArrayIndex<HighBitLowIndex>;

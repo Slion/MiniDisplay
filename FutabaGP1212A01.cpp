@@ -55,15 +55,15 @@ int GP1212A01A::Open()
         //Allocate both frames
         delete iFrameAlpha;
         iFrameAlpha=NULL;
-        iFrameAlpha=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameAlpha=new BitArrayHigh(KGP12xFrameBufferPixelCount);
         //
         delete iFrameBeta;
         iFrameBeta=NULL;
-        iFrameBeta=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameBeta=new BitArrayHigh(KGP12xFrameBufferPixelCount);
         //
         delete iFrameGamma;
         iFrameGamma=NULL;
-        iFrameGamma=new BitArray(KGP12xFrameBufferPixelCount);
+        iFrameGamma=new BitArrayHigh(KGP12xFrameBufferPixelCount);
         //
         iFrameNext=iFrameAlpha;
         iFrameCurrent=iFrameBeta;
@@ -111,6 +111,7 @@ void GP1212A01A::SetPixel(unsigned char aX, unsigned char aY, bool aOn)
 
 /**
 */
+/*
 void GP1212A01A::BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const
 	{
 	//TODO: amend loop values so that we don't keep on looping past our frame buffer dimensions.
@@ -122,6 +123,7 @@ void GP1212A01A::BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight,
 			}
 		}
 	}
+*/
 
 /**
 Clear our client side back buffer.
@@ -342,7 +344,7 @@ void GP1212A01A::SwapBuffers()
         //We can then compare previous and next frame and send only the differences to our device.
         //This mechanism allows us to reduce traffic over our USB bus thus improving our frame rate from 14 FPS to 30 FPS.
         //Keep our previous frame pointer
-        BitArray* previousFrame=iFramePrevious;
+        BitArrayHigh* previousFrame=iFramePrevious;
         //Current frame becomes the previous one
         iFramePrevious = iFrameCurrent;
         //Next frame becomes the current one
@@ -392,8 +394,8 @@ void GP1212A01A::SendModifiedPixelBlocks()
         }
     */
 
-    BitArray nextBlock(KPixelBlockSizeInBits);
-    BitArray previousBlock(KPixelBlockSizeInBits);
+    BitArrayHigh nextBlock(KPixelBlockSizeInBits);
+    BitArrayHigh previousBlock(KPixelBlockSizeInBits);
 
     for (int i=0;i<w;i+=KPixelBlockEdge)
         {

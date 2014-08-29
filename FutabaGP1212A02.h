@@ -13,7 +13,7 @@
 /**
 GP1212A01A is a graphic display module using a FUTABA 256x64dots VFD.
 The module do not include character ROM, the customer will compile the character
-by themselves (from main system).
+by themselves (from main system). 
 */
 class GP1212A02A : public GP1212XXXX
 	{
@@ -30,18 +30,13 @@ public:
 	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
-    virtual void BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const;
+    //virtual void BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const;
 	virtual void SetBrightness(int aBrightness);
 	virtual void Clear();
 	virtual void Fill();
 
-	//Specific to GP1212A01A
-	void SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char aValue);
-    void SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char* aPixels);
-    //Define display position within our display RAM
-	void SetDisplayPosition(unsigned char aX, unsigned char aY);
-    unsigned char DisplayPositionX() const {return iDisplayPositionX;}
-    unsigned char DisplayPositionY() const {return iDisplayPositionY;}
+	//Specific to GP1212A02A
+	void SetFrame(int aSize, unsigned char* aPixels);
 	
     //
     void RequestDeviceId();
@@ -62,18 +57,10 @@ public:
 	char* FirmwareRevision();
 
 private:
-	enum DW
-		{
-        DW1=0xC0,
-        DW2=0xD0
-		};
-
-	void SetDisplayPosition(DW aDw,unsigned char aX, unsigned char aY);
 	unsigned char OffScreenY() const;
 	void SendClearCommand();
 	void OffScreenTranslation(unsigned char& aX, unsigned char& aY);
 	void ResetBuffers();
-    void SendModifiedPixelBlocks();
 
 private:
 	unsigned char iDisplayPositionX;
@@ -87,13 +74,13 @@ private:
 	//FutabaVfdReport iReport;
 	///
 	//unsigned char iFrameBuffer[256*64];
-    BitArray* iFrameNext;
-    BitArray* iFrameCurrent;
-    BitArray* iFramePrevious;
+    BitArrayLow* iFrameNext;
+    BitArrayLow* iFrameCurrent;
+    BitArrayLow* iFramePrevious;
     //
-    BitArray* iFrameAlpha;
-    BitArray* iFrameBeta;
-    BitArray* iFrameGamma;
+    BitArrayLow* iFrameAlpha;
+    BitArrayLow* iFrameBeta;
+    BitArrayLow* iFrameGamma;
     //
     int iNeedFullFrameUpdate;
 	//unsigned char iFrameBeta[256*64];
