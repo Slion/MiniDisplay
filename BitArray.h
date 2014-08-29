@@ -71,26 +71,39 @@
 /***************************************************************************
 *                            TYPE DEFINITIONS
 ***************************************************************************/
+typedef unsigned char (*TBitInChar)(const unsigned int aBit);
+template <TBitInChar F>
 class BitArray;
+
+
+//Bits are indexed: 76543210
+inline unsigned char HighBitHighIndex(const unsigned int aBit) { return (1 << (((aBit)  % CHAR_BIT)));};
+
+//Bits are indexed: 01234567
+inline unsigned char HighBitLowIndex(const unsigned int aBit) { return (1 << (CHAR_BIT - 1 - ((aBit)  % CHAR_BIT)));};
+
+
 
 /**
 */
+template <TBitInChar F>
 class BitArrayIndex
 {
     public:
-        BitArrayIndex(BitArray *array, const unsigned int index);
+        BitArrayIndex(BitArray<F> *array, const unsigned int index);
 
         /* assignment */
         void operator=(const bool src);
 
     private:
-        BitArray *m_BitArray;        /* array index applies to */
+        BitArray<F> *m_BitArray;        /* array index applies to */
         unsigned int m_Index;           /* index of bit in array */
 };
 
 /**
 TODO: Derive a Bit Frame class from this one for X Y access to pixels.
 */
+template <TBitInChar F>
 class BitArray
 {
     public:
@@ -111,42 +124,42 @@ class BitArray
 		void SetBitValue(const unsigned int bit, bool aValue);
         void ClearBit(const unsigned int bit);
 
-        BitArrayIndex operator()(const unsigned int bit);
+        BitArrayIndex<F> operator()(const unsigned int bit);
 
         /* boolean operator */
         bool operator[](const unsigned int bit) const;
-        bool operator==(const BitArray &other) const;
-        bool operator!=(const BitArray &other) const;
-        bool operator<(const BitArray &other) const;
-        bool operator<=(const BitArray &other) const;
-        bool operator>(const BitArray &other) const;
-        bool operator>=(const BitArray &other) const;
+        bool operator==(const BitArray<F> &other) const;
+        bool operator!=(const BitArray<F> &other) const;
+        bool operator<(const BitArray<F> &other) const;
+        bool operator<=(const BitArray<F> &other) const;
+        bool operator>(const BitArray<F> &other) const;
+        bool operator>=(const BitArray<F> &other) const;
 
         /* bitwise operators */
-        BitArray operator&(const BitArray &other) const;
-        BitArray operator^(const BitArray &other) const;
-        BitArray operator|(const BitArray &other) const;
-        BitArray operator~(void) const;
+        BitArray<F> operator&(const BitArray<F> &other) const;
+        BitArray<F> operator^(const BitArray<F> &other) const;
+        BitArray<F> operator|(const BitArray<F> &other) const;
+        BitArray<F> operator~(void) const;
 
-        BitArray operator<<(const unsigned int count) const;
-        BitArray operator>>(const unsigned int count) const;
+        BitArray<F> operator<<(const unsigned int count) const;
+        BitArray<F> operator>>(const unsigned int count) const;
 
         /* increment/decrement */
-        BitArray& operator++(void);          /* prefix */
-        BitArray& operator++(int dummy);     /* postfix */
-        BitArray& operator--(void);          /* prefix */
-        BitArray& operator--(int dummy);     /* postfix */
+        BitArray<F>& operator++(void);          /* prefix */
+        BitArray<F>& operator++(int dummy);     /* postfix */
+        BitArray<F>& operator--(void);          /* prefix */
+        BitArray<F>& operator--(int dummy);     /* postfix */
 
         /* assignments */
-        BitArray& operator=(const BitArray &src);
+        BitArray<F>& operator=(const BitArray<F> &src);
 
-        BitArray& operator&=(const BitArray &src);
-        BitArray& operator^=(const BitArray &src);
-        BitArray& operator|=(const BitArray &src);
-        BitArray& Not(void);                 /* negate (~=) */
+        BitArray<F>& operator&=(const BitArray<F> &src);
+        BitArray<F>& operator^=(const BitArray<F> &src);
+        BitArray<F>& operator|=(const BitArray<F> &src);
+        BitArray<F>& Not(void);                 /* negate (~=) */
 
-        BitArray& operator<<=(unsigned const int shifts);
-        BitArray& operator>>=(unsigned const int shifts);
+        BitArray<F>& operator<<=(unsigned const int shifts);
+        BitArray<F>& operator>>=(unsigned const int shifts);
 
 		unsigned char* Ptr(){return m_Array;}
 		const unsigned char* Ptr() const{return m_Array;}
@@ -157,5 +170,8 @@ class BitArray
         unsigned char *m_Array;                 /* vector of characters */
         bool m_OwnsBuffer;
 };
+
+typedef BitArray<HighBitHighIndex> BitArrayHigh;
+typedef BitArray<HighBitLowIndex> BitArrayLow;
 
 #endif  /* ndef BIT_ARRAY_H */

@@ -13,10 +13,12 @@ Define an interface to some basic display functionality
 class DisplayBase
 	{
 public:
-	DisplayBase():iRequest(EMiniDisplayRequestNone),iPowerOn(false){	    
-	iDeviceId[0]=0;
-	iFirmwareRevision[0]=0;
-}
+	DisplayBase():iRequest(EMiniDisplayRequestNone),iPowerOn(false)
+		{	    
+		iDeviceId[0]=0;
+		iFirmwareRevision[0]=0;
+		}
+
 	virtual ~DisplayBase(){};
 	//
 	virtual int Open()=0;
