@@ -80,9 +80,81 @@ int GP1212A02A::Open()
 		SetNonBlocking(1);
 		//
 		SendClearCommand();
+
+		//Setup BMP box
+		BmpBoxSetting(EBmpBoxIdOne,0x0000,256,64);
+
+		//Select current BMP box
+		BmpBoxSelect(EBmpBoxIdOne);
+
+
 		}
 	return success;
 	}
+
+/**
+ Setting the BMP box
+[Code] 1BH,5CH,42H,Pn,aL,aH,Pw,Ph
+[Function] Setting the BMP box. BMP box can be defined the 3 area to DW. The position of BMP 
+box is set based on the address of DW. 
+* To write data in BMP box, BMP box select is necessary. 
+* Specifiable horizontal size is 256dot (100H) MAX. If horizontal size specify 256dot, Pw = 00H 
+Pn = Number of a BMP box 
+aL = Lower byte of address 
+aH = Upper byte of address 
+Pw = BMP box width 
+Ph = BMP box height 
+
+[Definable area]
+Pn = 31H - BMP box 1
+Pn = 32H - BMP box 2
+Pn = 33H - BMP box 3
+0000H <= aL + aH * 100 <= 07FFH 
+01H <= Pw <= 00H (=100H) 
+01H <= Ph <= 08H
+*/
+void GP1212A02A::BmpBoxSetting(TBmpBoxId aBoxId, unsigned short aAddress, int aWidth, int aHeight)
+	{
+	//TODO: check parameters validity
+	//1BH,5CH,42H,Pn,aL,aH,Pw,Ph
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+	report[1]=0x08; //Report length.
+	report[2]=0x1B; //Command ID
+	report[3]=0x5C; //Command ID
+	report[4]=0x42; //Command ID
+	report[5]=aBoxId; 
+	report[6]=(unsigned char)aAddress; //aL = DM lower byte
+	report[7]=aAddress>>8; //aH = DM upper byte
+	report[8]=(aWidth==256?0x00:aWidth); //Pw = BMP box width 00==256
+	report[9]=aHeight/8; //Ph = BMP box height.
+	Write(report);
+	}
+
+/**
+[Code]1BH,5CH,48H,Pn
+[Function]Select of BMP box 
+* Execution "BMP box select" is necessary before "Setting the Text box". 
+* In case of writing by the specified dot writing, it is necessary to cancel this command. 
+[Definable area]
+Pn = 30H - Remove the BMP box 
+Pn = 31H - BMP box 1
+Pn = 32H - BMP box 2
+Pn = 33H - BMP box 3
+*/
+void GP1212A02A::BmpBoxSelect(TBmpBoxId aBoxId)
+	{
+	//TODO: check parameters validity 
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+	report[1]=0x04; //Report length.
+	report[2]=0x1B; //Command ID
+	report[3]=0x5C; //Command ID
+	report[4]=0x48; //Command ID
+	report[5]=aBoxId; //BMP box ID
+	Write(report);
+	}
+
 
 /**
 */
@@ -182,21 +254,41 @@ void GP1212A02A::SetAllPixels(unsigned char aPattern)
 
 
 /**
-Using this function is advised against as is causes tearing.
-Use Clear instead.
+BMP data input 
+[Code] 1BH,4AH,Pm,aL,aH,Ps,nL,nH,Pd...Pd
+[Function] The BMP data is written in the DW(Display Window) or the Data memory. 
+Pm= DW or Data memory 
+aL = DW lower byte 
+aH = DW upper byte 
+Ps = Direction of writing 
+nL = number of BMP data length lower byte 
+nH = number of BMP data length upper byte 
+Pd = BMP data 
+* If X direction is selected as Ps and data is written in the last address, the data in the last address is 
+overwritten with the remaining data.  
+[Definable area] Pm = 30H : DW
+ Pm = 31H: Data memory 
+0000H <= aL + aH * 100 <= 07FFH (DW)
+0000H <= aL + aH * 100 <= 4FFFH (Data memory) 
+Ps = 30H: Y direction 
+Ps = 31H: X direction 
+0001H <= nL + nH * 100 <= 0100H(DW: X direction) 
+0001H <= nL + nH * 100 <= 0800H(DW: Y direction) 
+0001H <= nL + nH * 100 <= 0A00H(Data memory: X direction) 
+0001H <= nL + nH * 100 <= 5000H(Data memory: Y direction) 
 */
-void GP1212A02A::SetFrame(int aSize, unsigned char* aPixels)
+void GP1212A02A::BmpDataInput(TTarget aTarget, unsigned short aAddress, TDirection aDirection, unsigned short aSize, unsigned char* aPixels)
 {
 	FutabaVfdReport report;
     report[0]=0x00; //Report ID
     report[1]=(aSize<=report.Size()-10?aSize+0x08:64); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size
     report[2]=0x1B; //Command ID
     report[3]=0x4A; //Command ID
-    report[4]=0x30; //DW Display Window
-    report[5]=0x00; //aL = DW lower byte
-    report[6]=0x00; //aH = DW upper byte
-    report[7]=0x30; //Direction of writing: Y
-	report[8]=aSize; //Size of pixel data in bytes (LSB)
+    report[4]=aTarget; //Display Window or Data Memory
+    report[5]=(unsigned char)aAddress; //aL = DW lower byte
+    report[6]=aAddress>>8; //aH = DW upper byte
+    report[7]=aDirection; //Direction of writing: Y or X
+	report[8]=(unsigned char)aSize; //Size of pixel data in bytes (LSB)
 	report[9]=aSize>>8;	//Size of pixel data in bytes (MSB)
     int sizeWritten=MIN(aSize,report.Size()-10);
     memcpy(report.Buffer()+10, aPixels, sizeWritten);
@@ -215,6 +307,70 @@ void GP1212A02A::SetFrame(int aSize, unsigned char* aPixels)
         Write(report);
         }
 }
+
+
+/**
+Data memory transfer
+[Code] 1BH,5CH,44H,aL,aH
+[Function] BMP data transfer from Data memory to DW. 
+Although source data is updated, data in BMP box is not updated. To reflect the update, 
+re-executing this command is necessary. 
+aL = Lower byte of address 
+aH = Upper byte of address 
+[Definable area]
+0000H <= aL + aH * 100 <= 4FFFH 
+*/
+void GP1212A02A::BmpBoxDataMemoryTransfer(unsigned short aAddress)
+	{
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+    report[1]=0x05; //Report length.
+    report[2]=0x1B; //Command ID
+    report[3]=0x5C; //Command ID
+    report[4]=0x44; //Command ID
+    report[5]=(unsigned char)aAddress; //aL = DM lower byte
+    report[6]=aAddress>>8; //aH = DM upper byte
+	Write(report);
+	}
+
+/**
+Input BMP data in the BMP box 
+[Code] 1BH,5CH,5DH,nL,nH,Pd...Pd
+[Function] BMP data is written the BMP box 
+* Number of definable data is due to BMP box size. If the data is over range, the over range data is 
+rewritten the final address. 
+nL = Lower byte of number of definition byte 
+nH = Upper byte of number of definition byte 
+Pd = BMP data 
+[Definable area] Pn : BMP box size (Pw * Ph)
+*/
+void GP1212A02A::BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=(aSize<=report.Size()-7?aSize+0x05:64); //Report length. -7 is for our header first 10 bytes. +5 is for our Futaba header size
+    report[2]=0x1B; //Command ID
+    report[3]=0x5C; //Command ID
+    report[4]=0x5D; //Display Window or Data Memory
+	report[5]=(unsigned char)aSize; //Size of pixel data in bytes (LSB)
+	report[6]=aSize>>8;	//Size of pixel data in bytes (MSB)
+    int sizeWritten=MIN(aSize,report.Size()-7);
+    memcpy(report.Buffer()+7, aPixels, sizeWritten);
+    Write(report);
+
+    int remainingSize=aSize;
+    //We need to keep on sending our pixel data until we are done
+    while (report[1]==64)
+        {
+        report.Reset();
+        remainingSize-=sizeWritten;
+        report[0]=0x00; //Report ID
+        report[1]=(remainingSize<=report.Size()-2?remainingSize:64); //Report length, should be 64 or the remaining size
+        sizeWritten=(report[1]==64?63:report[1]);
+        memcpy(report.Buffer()+2, aPixels+(aSize-remainingSize), sizeWritten);
+        Write(report);
+        }
+	}
 
 /**
 Using this function is advised against as is causes tearing.
@@ -253,8 +409,13 @@ void GP1212A02A::SwapBuffers()
 	//Only perform buffer swapping if off screen mode is enabled
 	if (OffScreenMode())
 		{
-		//Send host back buffer to device back buffer
-		SetFrame(FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		//Send pixel directly into BMP box
+		BmpBoxDataInput(FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		//Send pixel data directly into the display window
+		//BmpDataInput(ETargetDisplayWindow,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		//Send pixel data first to Data Memory then copy into the selected BMP box	
+		//BmpDataInput(ETargetDataMemory,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		//BmpBoxDataMemoryTransfer(0x0000);
 
         //Cycle through our frame buffers
         //We keep track of previous frame which is in fact our device back buffer.
