@@ -36,7 +36,7 @@ public:
 	virtual void Fill();
 
 	//Specific to GP1212A02A
-	void SetFrame(int aSize, unsigned char* aPixels);
+	
 	
     //
     void RequestDeviceId();
@@ -55,6 +55,37 @@ public:
     bool PowerOn();
 	char* DeviceId();
 	char* FirmwareRevision();
+
+	enum TBmpBoxId
+	{
+		EBmpBoxIdNull=0x30,
+		EBmpBoxIdOne=0x31,
+		EBmpBoxIdTwo=0x32,
+		EBmpBoxIdThree=0x33
+	};
+
+	enum TTarget
+	{
+		ETargetDisplayWindow=0x30,
+		ETargetDataMemory=0x31
+	};
+
+
+	enum TDirection
+	{
+		EDirectionY=0x30,
+		EDirectionX=0x31
+	};
+
+
+	//General setting command
+	void BmpDataInput(TTarget aTarget, unsigned short aAddress, TDirection aDirection, unsigned short aSize, unsigned char* aPixels);
+
+	//BMP box
+	void BmpBoxSetting(TBmpBoxId aBoxId, unsigned short aAddress, int aWidth, int aHeight);
+	void BmpBoxSelect(TBmpBoxId aBoxId);
+	void BmpBoxDataMemoryTransfer(unsigned short aAddress);
+	void BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels);
 
 private:
 	unsigned char OffScreenY() const;
