@@ -30,18 +30,13 @@ public:
 	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
-    //virtual void BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const;
 	virtual void SetBrightness(int aBrightness);
 	virtual void Clear();
 	virtual void Fill();
+	virtual void Request(TMiniDisplayRequest aRequest);
 
-	//Specific to GP1212A02A
 	
-	
-    //
-    void RequestDeviceId();
-    void RequestFirmwareRevision();
-    void RequestPowerSupplyStatus();
+		
 	//
 	void ToggleOffScreenMode();
     void SetOffScreenMode(bool aOn);
@@ -70,7 +65,6 @@ public:
 		ETargetDataMemory=0x31
 	};
 
-
 	enum TDirection
 	{
 		EDirectionY=0x30,
@@ -78,6 +72,8 @@ public:
 	};
 
 
+private:
+	//Specific to GP1212A02A
 	//General setting command
 	void BmpDataInput(TTarget aTarget, unsigned short aAddress, TDirection aDirection, unsigned short aSize, unsigned char* aPixels);
 
@@ -86,6 +82,12 @@ public:
 	void BmpBoxSelect(TBmpBoxId aBoxId);
 	void BmpBoxDataMemoryTransfer(unsigned short aAddress);
 	void BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels);
+
+private:
+    void RequestDeviceId();
+    void RequestFirmwareRevision();
+    void RequestPowerSupplyStatus();
+
 
 private:
 	unsigned char OffScreenY() const;
@@ -122,6 +124,8 @@ private:
 	char iDeviceId[KFutabaMaxHidReportSize];
 	char iFirmwareRevision[KFutabaMaxHidReportSize];
     bool iPowerOn;
+	//
+	unsigned short iNextFrameAddress;
 	};
 
 
