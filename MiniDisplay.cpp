@@ -4,25 +4,24 @@
 #include "FutabaGP1212A02.h"
 
 
-
-//Open & Close functions
-MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
+MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType, bool aAutoDetect)
 	{
 	GraphicDisplay* device=NULL;
 
 	switch (aType)
 		{
 	case EMiniDisplayAutoDetect:
-		//TODO
-		device=new GP1212A01A();
-		break;
-
 	case EMiniDisplayFutabaGP1212A01:
 		device=new GP1212A01A();
 		break;
 		
 	case EMiniDisplayFutabaGP1212A02:
 		device=new GP1212A02A();
+		break;
+
+	case EMiniDisplayAutoDetectFailed:
+		//Auto detect sequence failed
+		return NULL;
 		break;
 		};
 
@@ -31,10 +30,29 @@ MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
 		{
 		delete device;
 		device=NULL;
+		if (aAutoDetect)
+			{
+			//Go recursive for auto detect
+			int typeValue=(int)aType;
+			typeValue++;
+			TMiniDisplayType nextType=(TMiniDisplayType)typeValue;
+			return MiniDisplayOpen(nextType,aAutoDetect);
+			}
 		}
 
 	return device;
 	}
+
+
+//Open & Close functions
+MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
+	{
+	bool autoDetect=aType==EMiniDisplayAutoDetect;
+	return MiniDisplayOpen(EMiniDisplayFutabaGP1212A01,autoDetect);
+	}
+
+
+
 
 //
 
