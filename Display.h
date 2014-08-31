@@ -5,12 +5,13 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include "HidDevice.h"
 const int KMaxDisplayStringLength = 256;
 
 /**
 Define an interface to some basic display functionality
 */
-class DisplayBase
+class DisplayBase: public HidDevice
 	{
 public:
 	DisplayBase():iRequest(EMiniDisplayRequestNone),iPowerOn(false)

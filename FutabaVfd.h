@@ -6,7 +6,6 @@
 #define FUTABA_VFD_H
 
 #include "hidapi.h"
-#include "HidDevice.h"
 #include "BitArray.h"
 #include "MiniDisplay.h"
 #include "Display.h"
@@ -71,7 +70,7 @@ private:
 
 /**
 */
-class FutabaGraphicDisplay : public GraphicDisplay, public HidDevice
+class FutabaGraphicDisplay : public GraphicDisplay
 	{
 public:
 	//From DisplayBase

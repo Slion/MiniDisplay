@@ -7,6 +7,9 @@
 
 const int KNumberOfFrameBeforeDiffAlgo = 3;
 
+const unsigned short KMaxDataMemoryAddress = 0x4FFF;
+const unsigned short KFrameSizeInBytes = 0x800;
+
 //
 // class GP1212A02A
 //
@@ -87,6 +90,7 @@ int GP1212A02A::Open()
 		//Select current BMP box
 		BmpBoxSelect(EBmpBoxIdOne);
 
+		iNextFrameAddress = 0x0000;
 
 		}
 	return success;
@@ -410,12 +414,20 @@ void GP1212A02A::SwapBuffers()
 	if (OffScreenMode())
 		{
 		//Send pixel directly into BMP box
-		BmpBoxDataInput(FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		//BmpBoxDataInput(FrameBufferSizeInBytes(),iFrameNext->Ptr());
 		//Send pixel data directly into the display window
 		//BmpDataInput(ETargetDisplayWindow,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
 		//Send pixel data first to Data Memory then copy into the selected BMP box	
 		//BmpDataInput(ETargetDataMemory,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
 		//BmpBoxDataMemoryTransfer(0x0000);
+		//Send pixel data first to Data Memory then copy into the selected BMP box, cycling through our Data Memory frmae
+		BmpDataInput(ETargetDataMemory,iNextFrameAddress,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		BmpBoxDataMemoryTransfer(iNextFrameAddress);
+		iNextFrameAddress+=KFrameSizeInBytes;
+		if (iNextFrameAddress>KMaxDataMemoryAddress)
+		{
+			iNextFrameAddress=0x0000;
+		}
 
         //Cycle through our frame buffers
         //We keep track of previous frame which is in fact our device back buffer.
@@ -456,6 +468,28 @@ void GP1212A02A::OffScreenTranslation(unsigned char& aX, unsigned char& aY)
 
 /**
 */
+void GP1212A02A::Request(TMiniDisplayRequest aRequest)
+	{
+	switch (aRequest)
+		{
+	case EMiniDisplayRequestDeviceId:
+		RequestDeviceId();
+		break;
+	case EMiniDisplayRequestFirmwareRevision:
+		RequestFirmwareRevision();
+		break;
+	case EMiniDisplayRequestPowerSupplyStatus:
+		RequestPowerSupplyStatus();
+		break;
+	default:
+		//Not supported
+		break;
+		};
+	}
+
+
+/**
+*/
 void GP1212A02A::ResetBuffers()
 	{
     //iNextFrame->ClearAll();
@@ -471,10 +505,32 @@ void GP1212A02A::RequestDeviceId()
     }
 
 /**
+ID code 
+[Code] 1BH,6AH,49H,44H
+[Function] Send the ID code to the Host system. ID code is software version.
 */
 void GP1212A02A::RequestFirmwareRevision()
     {
-	//Not supported
+    if (RequestPending())
+        {
+        //Abort silently for now
+        return;
+        }
+
+    //1BH,6AH,49H,44H
+    //Send Software Revision Read Command
+    FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report length
+    report[2]=0x1B; //Command ID
+    report[3]=0x6A; //Command ID
+    report[4]=0x49; //Command ID
+    report[5]=0x44; //Command ID
+    if (Write(report)==report.Size())
+        {
+        SetRequest(EMiniDisplayRequestFirmwareRevision);
+        }
+
     }
 
 /**
@@ -520,8 +576,31 @@ Tries to complete our current request if we have one pending.
  */
 TMiniDisplayRequest GP1212A02A::AttemptRequestCompletion()
     {
-	//That display does not support any requests
-	return EMiniDisplayRequestNone;
+    if (!RequestPending())
+        {
+        return EMiniDisplayRequestNone;
+        }
+
+    int res=Read(iInputReport);
+
+    if (!res)
+        {
+        return EMiniDisplayRequestNone;
+        }
+
+    //Process our request
+	if (CurrentRequest()==EMiniDisplayRequestFirmwareRevision)
+		{
+			unsigned char* ptr=&iInputReport[2];
+			iInputReport[7]=0x00;
+			strcpy(iFirmwareRevision,(const char*)ptr);
+		}
+
+    TMiniDisplayRequest completed=CurrentRequest();
+    //Our request was completed
+    SetRequest(EMiniDisplayRequestNone);
+
+    return completed;
 	}
 
 

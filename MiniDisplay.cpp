@@ -141,19 +141,19 @@ void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue)
 //-------------------------------------------------------------
 wchar_t* MiniDisplayVendor(MiniDisplayDevice aDevice)
     {
-    return ((GP1212A01A*)aDevice)->Vendor();
+    return ((GraphicDisplay*)aDevice)->Vendor();
     }
 
 //-------------------------------------------------------------
 wchar_t* MiniDisplayProduct(MiniDisplayDevice aDevice)
     {
-    return ((GP1212A01A*)aDevice)->Product();
+    return ((GraphicDisplay*)aDevice)->Product();
     }
 
 //-------------------------------------------------------------
 wchar_t* MiniDisplaySerialNumber(MiniDisplayDevice aDevice)
     {
-    return ((GP1212A01A*)aDevice)->SerialNumber();
+    return ((GraphicDisplay*)aDevice)->SerialNumber();
     }
 
 //-------------------------------------------------------------
@@ -177,7 +177,7 @@ TMiniDisplayRequest MiniDisplayCurrentRequest(MiniDisplayDevice aDevice)
 //-------------------------------------------------------------
 void MiniDisplayCancelRequest(MiniDisplayDevice aDevice)
     {
-    ((GP1212A01A*)aDevice)->CancelRequest();
+    ((GraphicDisplay*)aDevice)->CancelRequest();
     }
 
 //-------------------------------------------------------------
