@@ -185,6 +185,24 @@ Get power supply status.
 */
 extern "C" MDAPI bool MiniDisplayPowerSupplyStatus(MiniDisplayDevice aDevice);
 
+/**
+Turn device Power ON.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayPowerOn(MiniDisplayDevice aDevice);
+
+/**
+Turn device Power OFF.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayPowerOff(MiniDisplayDevice aDevice);
+
+/**
+Specifies whether or not this display supports power ON/OFF functions.
+@param [IN] The device to apply this command to.
+@return True if one can turn display power on and off, false otherwise.
+*/
+extern "C" MDAPI bool MiniDisplaySupportPowerOnOff(MiniDisplayDevice aDevice);
 
 
 #endif

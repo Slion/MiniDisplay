@@ -201,5 +201,23 @@ char* MiniDisplayFirmwareRevision(MiniDisplayDevice aDevice)
 //-------------------------------------------------------------
 bool MiniDisplayPowerSupplyStatus(MiniDisplayDevice aDevice)
 	{
-	return ((GraphicDisplay*)aDevice)->PowerOn();
+	return ((GraphicDisplay*)aDevice)->IsPowerOn();
 	}
+
+//-------------------------------------------------------------
+void MiniDisplayPowerOn(MiniDisplayDevice aDevice)
+    {
+    ((GraphicDisplay*)aDevice)->TurnPowerOn();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayPowerOff(MiniDisplayDevice aDevice)
+    {
+    ((GraphicDisplay*)aDevice)->TurnPowerOff();
+    }
+
+//-------------------------------------------------------------
+bool MiniDisplaySupportPowerOnOff(MiniDisplayDevice aDevice)
+    {
+    return ((GraphicDisplay*)aDevice)->SupportPowerOnOff();
+    }

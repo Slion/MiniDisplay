@@ -629,7 +629,7 @@ void GP1212A02A::SetBrightness(int aBrightness)
 
 /**
 */
-bool GP1212A02A::PowerOn()
+bool GP1212A02A::IsPowerOn()
 	{
 	return iPowerOn;
 	}
@@ -646,4 +646,42 @@ char* GP1212A02A::DeviceId()
 char* GP1212A02A::FirmwareRevision()
 	{
 	return iFirmwareRevision;
+	}
+
+/**
+VFD Power ON/OFF 
+[Code]1BH,4AH,42H,Ps
+[Function]Control of the power supply for VFD 
+* If VFD power ON or OFF, at interval of 10s or more. 
+* When the VFD power off, VFD display is turn off, but the module can receive a data and 
+process.
+Ps = VFD Power control 
+[Definable area]
+Ps = 30H : VFD Power OFF 
+Ps = 31H : VFD Power ON  (Default)
+*/
+void GP1212A02A::SendCommandPower(TPowerStatus aPowerStatus)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x4A; //Command ID
+    report[4]=0x42; //Command ID
+    report[5]=aPowerStatus; //ON or OFF
+    Write(report);
+	}
+
+/**
+*/
+void GP1212A02A::TurnPowerOn()
+	{
+	SendCommandPower(EPowerOn);
+	}
+
+/**
+*/
+void GP1212A02A::TurnPowerOff()
+	{
+	SendCommandPower(EPowerOff);
 	}
