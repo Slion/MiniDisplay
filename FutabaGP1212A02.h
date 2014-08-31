@@ -27,7 +27,11 @@ public:
 	virtual void SwapBuffers();
 	virtual void TurnPowerOn();
 	virtual void TurnPowerOff();
-	virtual bool SupportPowerOnOff(){return true;} 
+	virtual bool SupportPowerOnOff(){return true;}
+	virtual void ShowClock();
+	virtual void HideClock();
+	virtual bool SupportClock(){return true;}
+
 
 
 	//From GraphicDisplay
@@ -55,6 +59,8 @@ public:
 	char* DeviceId();
 	char* FirmwareRevision();
 
+private:
+
 	enum TBmpBoxId
 	{
 		EBmpBoxIdNull=0x30,
@@ -81,28 +87,70 @@ public:
 		EPowerOn=0x31
 	};
 
+	enum TWeekDay
+	{
+		ESunday		=	0x00,
+		EMonday		=	0x01,
+		ETuesday	=	0x02,
+		EWednesday	=	0x03,
+		EThrusday	=	0x04,
+		EFriday		=	0x05,
+		ESaturday	=	0x06
+	};
+
+	enum TClockFormat
+	{
+		EClock24	=	0x00,
+		EClockDay24	=	0x01,
+		EClock12	=	0x10,
+		EClockDay12	=	0x11
+	};
+
+	enum TClockSize
+	{
+		EClockTiny		=	0x30,
+		EClockSmall		=	0x31,
+		EClockMedium	=	0x32,
+		EClockLarge		=	0x33
+	};
+
+
 private:
 	//Specific to GP1212A02A
 	//General setting command
+	void SendCommandClear();
+	//
 	void BmpDataInput(TTarget aTarget, unsigned short aAddress, TDirection aDirection, unsigned short aSize, unsigned char* aPixels);
+	//
+	void SendCommandPower(TPowerStatus aPowerStatus);
+	//Clock commands
+	void SendCommandClockSetting(TWeekDay aWeekDay, unsigned char aHour, unsigned char aMinute);
+	void SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize);
+	void SendCommandClockCancel();
+
 
 	//BMP box
 	void BmpBoxSetting(TBmpBoxId aBoxId, unsigned short aAddress, int aWidth, int aHeight);
 	void BmpBoxSelect(TBmpBoxId aBoxId);
 	void BmpBoxDataMemoryTransfer(unsigned short aAddress);
 	void BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels);
-	//
-	void SendCommandPower(TPowerStatus aPowerStatus);
+
+	//Clock utilities
+	int ClockCharCount(TClockFormat aFormat);
+	int ClockCharWidthInPixels(TClockSize aSize);
+	int ClockCharHeightInPixels(TClockSize aSize);
+	unsigned short ClockCenterAddress(TClockFormat aFormat, TClockSize aSize);
 
 private:
     void RequestDeviceId();
     void RequestFirmwareRevision();
     void RequestPowerSupplyStatus();
+	//
+	void SetClockSetting();
 
 
 private:
-	unsigned char OffScreenY() const;
-	void SendClearCommand();
+	unsigned char OffScreenY() const;	
 	void OffScreenTranslation(unsigned char& aX, unsigned char& aY);
 	void ResetBuffers();
 

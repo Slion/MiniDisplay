@@ -204,6 +204,25 @@ Specifies whether or not this display supports power ON/OFF functions.
 */
 extern "C" MDAPI bool MiniDisplaySupportPowerOnOff(MiniDisplayDevice aDevice);
 
+/**
+Show built-in clock.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayShowClock(MiniDisplayDevice aDevice);
+
+/**
+Hide built-in clock.
+@param [IN] The device to apply this command to.
+*/
+extern "C" MDAPI void MiniDisplayHideClock(MiniDisplayDevice aDevice);
+
+/**
+Specifies whether or not this display supports clock functions.
+@param [IN] The device to apply this command to.
+@return True if this display supports built-in clock, false otherwise.
+*/
+extern "C" MDAPI bool MiniDisplaySupportClock(MiniDisplayDevice aDevice);
+
 
 #endif
 

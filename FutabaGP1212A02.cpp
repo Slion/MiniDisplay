@@ -4,8 +4,8 @@
 
 #include "FutabaGP1212A02.h"
 
-
-const int KNumberOfFrameBeforeDiffAlgo = 3;
+#include <stdio.h>
+#include <time.h>
 
 const unsigned short KMaxDataMemoryAddress = 0x4FFF;
 const unsigned short KFrameSizeInBytes = 0x800;
@@ -82,15 +82,19 @@ int GP1212A02A::Open()
         //
 		SetNonBlocking(1);
 		//
-		SendClearCommand();
+		SendCommandClear();
+		//
+		SetClockSetting();
 
+		//BMP box setup could be removed if we don't use it anymore
 		//Setup BMP box
 		BmpBoxSetting(EBmpBoxIdOne,0x0000,256,64);
-
 		//Select current BMP box
 		BmpBoxSelect(EBmpBoxIdOne);
-
+		//
 		iNextFrameAddress = 0x0000;
+
+
 
 		}
 	return success;
@@ -216,7 +220,7 @@ void GP1212A02A::Clear()
         }
     else
         {
-        SendClearCommand();
+        SendCommandClear();
         }
     }
 
@@ -380,7 +384,7 @@ void GP1212A02A::BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels)
 Using this function is advised against as is causes tearing.
 Use Clear instead.
 */
-void GP1212A02A::SendClearCommand()
+void GP1212A02A::SendCommandClear()
 	{
     //1BH,4AH,43H,44H
     //Send Clear Display Command
@@ -677,6 +681,7 @@ void GP1212A02A::SendCommandPower(TPowerStatus aPowerStatus)
 void GP1212A02A::TurnPowerOn()
 	{
 	SendCommandPower(EPowerOn);
+	SetClockSetting();
 	}
 
 /**
@@ -684,4 +689,206 @@ void GP1212A02A::TurnPowerOn()
 void GP1212A02A::TurnPowerOff()
 	{
 	SendCommandPower(EPowerOff);
+	}
+
+
+/**
+Number of characters for the given clock format.
+@return 
+*/
+int GP1212A02A::ClockCharCount(TClockFormat aFormat)
+	{
+	switch (aFormat)
+		{
+	case EClockDay12:
+	case EClockDay24:
+		return 10;
+	case EClock12:
+	case EClock24:
+		return 5;
+		}
+
+	return 10;
+	}
+
+/**
+@return 
+*/
+int GP1212A02A::ClockCharWidthInPixels(TClockSize aSize)
+	{
+	switch (aSize)
+		{
+	case EClockTiny:
+		return 6;
+	case EClockSmall:
+		return 8;
+	case EClockMedium:
+		return 12;
+	case EClockLarge:
+		return 16;
+		}
+
+	return 16;
+	}
+
+/**
+@return 
+*/
+int GP1212A02A::ClockCharHeightInPixels(TClockSize aSize)
+	{
+	switch (aSize)
+		{
+	case EClockTiny:
+		return 8;
+	case EClockSmall:
+		return 16;
+	case EClockMedium:
+		return 24;
+	case EClockLarge:
+		return 32;
+		}
+
+	return 32;
+	}
+
+/**
+Return the Display Window address for centering the clock corresponding to the given parameters.
+*/
+unsigned short GP1212A02A::ClockCenterAddress(TClockFormat aFormat, TClockSize aSize)
+	{
+		int charCount=ClockCharCount(aFormat);
+		int halfWidth=(ClockCharWidthInPixels(aSize)*charCount)/2;
+		int halfHeight=(ClockCharHeightInPixels(aSize))/2;
+		int x=(WidthInPixels()/2)-halfWidth;
+		int y=(HeightInPixels()/2)-halfHeight;
+
+		int yOffset=y/8;
+		int xOffset=x*8; //Not sure why...
+
+		unsigned short address = yOffset+xOffset;
+		//
+		return address;
+	}
+
+/**
+*/
+void GP1212A02A::ShowClock()
+	{
+	SendCommandClockDisplay(EClockDay24,ClockCenterAddress(EClockDay24,EClockLarge),EClockLarge);
+	}
+
+/**
+*/
+void GP1212A02A::HideClock()
+	{
+	SendCommandClockCancel();
+	}
+
+
+/**
+Clock setting 
+[Code]1BH,6BH,53H,Pd,Ph,Pm 
+[Function]Setting the clock data. The setting data is cleared, if the Reset command is input or power 
+is turned off. 
+Pd = Day of the week 
+Ph = hour 
+Pm = minute 
+[Definable area]
+Pd = 00H : Sunday 
+Pd = 01H : Monday 
+...
+Pd = 06H : Saturday 
+* Clock setting is canceled, when Pd is input value that is larger than 07H, or Ph is input value that is 
+larger than 18H,or Pm is input value that is larger than 3CH. 
+*/
+void GP1212A02A::SendCommandClockSetting(TWeekDay aWeekDay, unsigned char aHour, unsigned char aMinute)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x06; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x6B; //Command ID
+    report[4]=0x53; //Command ID
+    report[5]=aWeekDay; //Sunday to Saturday
+	report[6]=aHour;
+	report[7]=aMinute;
+
+    Write(report);
+	}
+
+
+/**
+Set display clock settings according to local system time.
+This needs to be redone whenever we open or turn on our display.
+*/
+void GP1212A02A::SetClockSetting()
+	{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	//
+	SendCommandClockSetting((TWeekDay)timeinfo->tm_wday,timeinfo->tm_hour,timeinfo->tm_min);
+	}
+
+
+/**
+Clock display
+[Code] 1BH,6BH,55H,Ps,aL,aH,Pf
+[Function] Clock is displayed. The display position and the font size can be freely decided. 
+Ps = Display type select 
+aL,aH = Address 
+Pf = Font size select 
+[Definable area]
+Ps = 00H : 24hour Ex.[12:34] 
+Ps = 01H : 24hour + day of the week  Ex.[Wed._12:34] 
+Ps = 10H : 12hour Ex.[PM_00:34] 
+Ps = 11H : 12hour + day of the week  Ex.[Wed._PM_00:34] 
+Pf = 30H : 6x8 dot 
+Pf = 31H : 8x16dot
+Pf = 32H : 12x24 dot 
+Pf = 33H : 16x32 dot 
+* When the clock data is not input, clock is not displayed. 
+* The clock display is maintained until Clock display cancel "Clear display" RESET command is input 
+or power is turned off. 
+The clock display area
+Graphic can be displayed excluding the clock display area.
+The self adjustment for the position 
+that cannot be displayed. 
+* Excluding the clock display area can be input other display commands.
+*/
+void GP1212A02A::SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x07; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x6B; //Command ID
+    report[4]=0x55; //Command ID
+    report[5]=aClockFormat; //
+	report[6]=(unsigned char)aAddress;	//aL
+	report[7]=aAddress>>8;				//aH
+	report[8]=aSize;
+
+    Write(report);
+	}
+
+
+/**
+ Clock display cancel 
+[Code] 1BH,6BH,3DH,58H
+[Function] Clock display is canceled.
+*/
+void GP1212A02A::SendCommandClockCancel()
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x6B; //Command ID
+    report[4]=0x3D; //Command ID
+    report[5]=0x58; //
+
+    Write(report);
 	}

@@ -221,3 +221,21 @@ bool MiniDisplaySupportPowerOnOff(MiniDisplayDevice aDevice)
     {
     return ((GraphicDisplay*)aDevice)->SupportPowerOnOff();
     }
+
+//-------------------------------------------------------------
+void MiniDisplayShowClock(MiniDisplayDevice aDevice)
+    {
+    ((GraphicDisplay*)aDevice)->ShowClock();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplayHideClock(MiniDisplayDevice aDevice)
+    {
+    ((GraphicDisplay*)aDevice)->HideClock();
+    }
+
+//-------------------------------------------------------------
+bool MiniDisplaySupportClock(MiniDisplayDevice aDevice)
+    {
+    return ((GraphicDisplay*)aDevice)->SupportClock();
+    }
