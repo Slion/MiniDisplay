@@ -5,6 +5,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+
 #include "HidDevice.h"
 const int KMaxDisplayStringLength = 256;
 
@@ -47,7 +48,11 @@ public:
 
 	virtual void TurnPowerOn(){}
 	virtual void TurnPowerOff(){}
-	virtual bool SupportPowerOnOff(){return false;} 
+	virtual bool SupportPowerOnOff(){return false;}
+
+	virtual void ShowClock(){}
+	virtual void HideClock(){}
+	virtual bool SupportClock(){return false;}
 
 protected:
 	void SetRequest(TMiniDisplayRequest aRequest) { iRequest=aRequest; }
