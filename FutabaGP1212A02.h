@@ -25,6 +25,10 @@ public:
 	//From DisplayBase
 	int Open();
 	virtual void SwapBuffers();
+	virtual void TurnPowerOn();
+	virtual void TurnPowerOff();
+	virtual bool SupportPowerOnOff(){return true;} 
+
 
 	//From GraphicDisplay
 	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
@@ -47,7 +51,7 @@ public:
     //    
     TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
-    bool PowerOn();
+    bool IsPowerOn();
 	char* DeviceId();
 	char* FirmwareRevision();
 
@@ -71,6 +75,11 @@ public:
 		EDirectionX=0x31
 	};
 
+	enum TPowerStatus
+	{
+		EPowerOff=0x30,
+		EPowerOn=0x31
+	};
 
 private:
 	//Specific to GP1212A02A
@@ -82,6 +91,8 @@ private:
 	void BmpBoxSelect(TBmpBoxId aBoxId);
 	void BmpBoxDataMemoryTransfer(unsigned short aAddress);
 	void BmpBoxDataInput(unsigned short aSize, unsigned char* aPixels);
+	//
+	void SendCommandPower(TPowerStatus aPowerStatus);
 
 private:
     void RequestDeviceId();

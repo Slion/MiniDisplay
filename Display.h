@@ -41,9 +41,13 @@ public:
     virtual void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
 	virtual bool RequestPending(){return iRequest!=EMiniDisplayRequestNone;}
 
-    virtual bool PowerOn()	{return iPowerOn;}
+    virtual bool IsPowerOn()	{return iPowerOn;}
 	virtual char* DeviceId() {return iDeviceId;}
 	virtual char* FirmwareRevision() {return iFirmwareRevision;}
+
+	virtual void TurnPowerOn(){}
+	virtual void TurnPowerOff(){}
+	virtual bool SupportPowerOnOff(){return false;} 
 
 protected:
 	void SetRequest(TMiniDisplayRequest aRequest) { iRequest=aRequest; }
