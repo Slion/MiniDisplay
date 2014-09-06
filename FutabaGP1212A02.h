@@ -106,12 +106,12 @@ private:
 		EClockDay12	=	0x11
 	};
 
-	enum TClockSize
+	enum TFontSizeLogical
 	{
-		EClockTiny		=	0x30,
-		EClockSmall		=	0x31,
-		EClockMedium	=	0x32,
-		EClockLarge		=	0x33
+		EFontTiny		=	0x30,
+		EFontSmall		=	0x31,
+		EFontMedium	=	0x32,
+		EFontLarge		=	0x33
 	};
 
 	enum TFontSize
@@ -144,11 +144,12 @@ private:
 	void SendCommandPower(TPowerStatus aPowerStatus);
 	//Clock commands
 	void SendCommandClockSetting(TWeekDay aWeekDay, unsigned char aHour, unsigned char aMinute);
-	void SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize);	
+	void SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TFontSizeLogical aSize);	
 	void SendCommandClockCancel();
 	//Font commands
 	void SendCommandDefineCharacter(TFontSize aFontSize, unsigned short aCharacterCode, unsigned char* aPixelData);
 	void SendCommandFontAction(TFontAction aFontAction);
+	void SendCommandSelectFontSize(TFontSizeLogical aFontSoze);
 
 
 	//BMP box
@@ -159,9 +160,9 @@ private:
 
 	//Clock utilities
 	int ClockCharCount(TClockFormat aFormat);
-	int ClockCharWidthInPixels(TClockSize aSize);
-	int ClockCharHeightInPixels(TClockSize aSize);
-	unsigned short ClockCenterAddress(TClockFormat aFormat, TClockSize aSize);
+	int ClockCharWidthInPixels(TFontSizeLogical aSize);
+	int ClockCharHeightInPixels(TFontSizeLogical aSize);
+	unsigned short ClockCenterAddress(TClockFormat aFormat, TFontSizeLogical aSize);
 	//Font utilities
 	int CharacterSizeInBytes(TFontSize aFontSize);
 

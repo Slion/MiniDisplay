@@ -102,11 +102,14 @@ int GP1212A02A::Open()
 		iNextFrameAddress = 0x0000;
 
 		//Beta font test
-		//SendCommandFontAction(EFontDelete);
-		
+		/*
+		SendCommandFontAction(EFontDelete);
+
+		//SendCommandSelectFontSize(EFontLarge);		
 		//SendCommandReset();
 
-		/*
+		
+		
 		unsigned char charPixels[]={	0xFF,0xFF,0xFF,0xFF,
 										0x80,0x00,0x00,0x01,
 										0x80,0x00,0x00,0x01,
@@ -125,13 +128,19 @@ int GP1212A02A::Open()
 										0xFF,0xFF,0xFF,0xFF};
 		
 		
+		//SendCommandFontAction(EFontStore);
 		for (unsigned short i=0;i<16;i++)
 		{
+			//SendCommandFontAction(EFontDelete);
+			
 			SendCommandDefineCharacter(EFont16x32,0x0030+i,charPixels);
 			//SendCommandFontAction(EFontStore);
+			
+			
 			//sleep(100);
 		}
 		*/
+		//SendCommandFontAction(EFontTransfer);
 		
 
 		//SendCommandDefineCharacter(EFont16x32,0x0031,charPixels);
@@ -788,17 +797,17 @@ int GP1212A02A::ClockCharCount(TClockFormat aFormat)
 /**
 @return Clock character width in pixels.
 */
-int GP1212A02A::ClockCharWidthInPixels(TClockSize aSize)
+int GP1212A02A::ClockCharWidthInPixels(TFontSizeLogical aSize)
 	{
 	switch (aSize)
 		{
-	case EClockTiny:
+	case EFontTiny:
 		return 6;
-	case EClockSmall:
+	case EFontSmall:
 		return 8;
-	case EClockMedium:
+	case EFontMedium:
 		return 12;
-	case EClockLarge:
+	case EFontLarge:
 		return 16;
 		}
 
@@ -808,17 +817,17 @@ int GP1212A02A::ClockCharWidthInPixels(TClockSize aSize)
 /**
 @return Clock character height in pixels.
 */
-int GP1212A02A::ClockCharHeightInPixels(TClockSize aSize)
+int GP1212A02A::ClockCharHeightInPixels(TFontSizeLogical aSize)
 	{
 	switch (aSize)
 		{
-	case EClockTiny:
+	case EFontTiny:
 		return 8;
-	case EClockSmall:
+	case EFontSmall:
 		return 16;
-	case EClockMedium:
+	case EFontMedium:
 		return 24;
-	case EClockLarge:
+	case EFontLarge:
 		return 32;
 		}
 
@@ -828,7 +837,7 @@ int GP1212A02A::ClockCharHeightInPixels(TClockSize aSize)
 /**
 Return the Display Window address for centering the clock corresponding to the given parameters.
 */
-unsigned short GP1212A02A::ClockCenterAddress(TClockFormat aFormat, TClockSize aSize)
+unsigned short GP1212A02A::ClockCenterAddress(TClockFormat aFormat, TFontSizeLogical aSize)
 	{
 		int charCount=ClockCharCount(aFormat);
 		int halfWidth=(ClockCharWidthInPixels(aSize)*charCount)/2;
@@ -848,7 +857,7 @@ unsigned short GP1212A02A::ClockCenterAddress(TClockFormat aFormat, TClockSize a
 */
 void GP1212A02A::ShowClock()
 	{
-	SendCommandClockDisplay(EClockDay24,ClockCenterAddress(EClockDay24,EClockLarge),EClockLarge);
+	SendCommandClockDisplay(EClock24,ClockCenterAddress(EClock24,EFontLarge),EFontLarge);
 	}
 
 /**
@@ -932,7 +941,7 @@ The self adjustment for the position
 that cannot be displayed. 
 * Excluding the clock display area can be input other display commands.
 */
-void GP1212A02A::SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize)
+void GP1212A02A::SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TFontSizeLogical aSize)
 	{
 	FutabaVfdReport report;
     report[0]=0x00; //Report ID
@@ -1081,7 +1090,6 @@ Ps = 30H : Store
 Ps = 31H : Transfer
 Ps = 32H : Delete
 */
-
 void GP1212A02A::SendCommandFontAction(TFontAction aFontAction)
 	{
 	FutabaVfdReport report;
@@ -1091,6 +1099,30 @@ void GP1212A02A::SendCommandFontAction(TFontAction aFontAction)
     report[3]=0x6A; //Command ID
     report[4]=0x45; //Command ID
     report[5]=aFontAction; //Ps
+
+    Write(report);
+	}
+
+
+/**
+[Code]1BH,4AH,46H,Pf
+[Function]Setting the font size 
+ Pf = Font size 
+[Definable area]
+Pf = 30H?6x8 dot 
+Pf = 31H?8x16dot and 16x16 dot 
+Pf = 32H?12x24 dot and 24x24 dot 
+Pf = 33H?16x32 dot and 32x32 dot
+*/
+void GP1212A02A::SendCommandSelectFontSize(TFontSizeLogical aFontSoze)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x4A; //Command ID
+    report[4]=0x46; //Command ID
+    report[5]=aFontSoze; //Pf
 
     Write(report);
 	}
