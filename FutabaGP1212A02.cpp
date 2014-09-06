@@ -701,9 +701,11 @@ int GP1212A02A::ClockCharCount(TClockFormat aFormat)
 	switch (aFormat)
 		{
 	case EClockDay12:
+		return 13;
 	case EClockDay24:
 		return 10;
 	case EClock12:
+		return 8;
 	case EClock24:
 		return 5;
 		}
