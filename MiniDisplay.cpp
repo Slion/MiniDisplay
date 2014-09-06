@@ -48,7 +48,9 @@ MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType, bool aAutoDetect)
 MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
 	{
 	bool autoDetect=aType==EMiniDisplayAutoDetect;
-	return MiniDisplayOpen(EMiniDisplayFutabaGP1212A01,autoDetect);
+	//If we want auto detect we need to pass in our first display type
+	//If we don't want auto detect we just pass in the given display type. 
+	return MiniDisplayOpen((autoDetect?EMiniDisplayFutabaGP1212A01:aType),autoDetect);
 	}
 
 
