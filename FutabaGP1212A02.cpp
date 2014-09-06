@@ -10,6 +10,13 @@
 const unsigned short KMaxDataMemoryAddress = 0x4FFF;
 const unsigned short KFrameSizeInBytes = 0x800;
 
+
+void sleep(unsigned int mseconds)
+	{
+    clock_t goal = mseconds + clock();
+    while (goal > clock());
+	}
+
 //
 // class GP1212A02A
 //
@@ -93,6 +100,45 @@ int GP1212A02A::Open()
 		BmpBoxSelect(EBmpBoxIdOne);
 		//
 		iNextFrameAddress = 0x0000;
+
+		//Beta font test
+		//SendCommandFontAction(EFontDelete);
+		
+		//SendCommandReset();
+
+		/*
+		unsigned char charPixels[]={	0xFF,0xFF,0xFF,0xFF,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x81,0xFF,0xFF,0xE1,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0x80,0x00,0x00,0x01,
+										0xFF,0xFF,0xFF,0xFF};
+		
+		
+		for (unsigned short i=0;i<16;i++)
+		{
+			SendCommandDefineCharacter(EFont16x32,0x0030+i,charPixels);
+			//SendCommandFontAction(EFontStore);
+			//sleep(100);
+		}
+		*/
+		
+
+		//SendCommandDefineCharacter(EFont16x32,0x0031,charPixels);
+		//SendCommandFontAction(EFontStore);
+
+
+		//
 
 
 
@@ -400,6 +446,31 @@ void GP1212A02A::SendCommandClear()
 
 
 /**
+Returns to default setting. 
+* The other command is not receive until this command complete. Please don’t send the any data 
+from a host during “BUSY” 
+* Delete the User definable font to the RAM. 
+* If the VFD Power Off, VFD Power turn ON after the RESET command.
+*/
+void GP1212A02A::SendCommandReset()
+	{
+    //1BH,4AH,43H,44H
+    //Send Clear Display Command
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+	report[1]=0x04; //Report length
+	report[2]=0x1B; //Command ID
+	report[3]=0x4A; //Command ID
+	report[4]=0x52; //Command ID
+	report[5]=0x53; //Command ID
+	Write(report);
+	//Wait until reset is done. Is that needed?
+	sleep(2000);
+
+	}
+
+
+/**
 Provide Y coordinate of our off screen buffer.
 */
 unsigned char GP1212A02A::OffScreenY() const
@@ -693,8 +764,9 @@ void GP1212A02A::TurnPowerOff()
 
 
 /**
-Number of characters for the given clock format.
-@return 
+Provide the length of our character string for the given clock format.
+@param The clock format to evaluate.
+@return Number of characters for the given clock format.
 */
 int GP1212A02A::ClockCharCount(TClockFormat aFormat)
 	{
@@ -714,7 +786,7 @@ int GP1212A02A::ClockCharCount(TClockFormat aFormat)
 	}
 
 /**
-@return 
+@return Clock character width in pixels.
 */
 int GP1212A02A::ClockCharWidthInPixels(TClockSize aSize)
 	{
@@ -734,7 +806,7 @@ int GP1212A02A::ClockCharWidthInPixels(TClockSize aSize)
 	}
 
 /**
-@return 
+@return Clock character height in pixels.
 */
 int GP1212A02A::ClockCharHeightInPixels(TClockSize aSize)
 	{
@@ -891,6 +963,134 @@ void GP1212A02A::SendCommandClockCancel()
     report[3]=0x6B; //Command ID
     report[4]=0x3D; //Command ID
     report[5]=0x58; //
+
+    Write(report);
+	}
+
+
+/**
+@return Size in bytes of a character for a given font size.
+*/
+int GP1212A02A::CharacterSizeInBytes(TFontSize aFontSize)
+	{
+	switch (aFontSize)
+		{
+	case EFont6x8:
+		return 6;
+	case EFont8x16:
+		return 16;
+	case EFont12x24:
+		return 36;
+	case EFont16x32:
+		return 64;
+	case EFont16x16:
+		return 32;
+	case EFont24x24:
+		return 72;
+	case EFont32x32:
+		return 128;
+		}
+
+	return 0;
+	}
+
+/**
+Define the User definable font (RAM) 
+[Code] 1BH,6AH,47H,Pf,cL,(cH),Pd...Pd
+[Function] Define the User definable font into RAM. A maximum 16 characters can be defined 
+within each font size. 
+The User definable fonts are displayed the defined code. It is a same process to normal fonts.  
+The User definable fonts are valid until they redefined, Reset command, or the power off. 
+If define the user definable font over 16 characters, at first defined user definable font is removed    
+If the defined code is specified, existing data is re-written. 
+If the 16x16, 24x24, 32x32 size define, it must specify the “cH” 
+Pf = Font size 
+cL = Lower byte of User definable font code 
+cH = Upper byte of User definable font code 
+Pd = Definition data 
+[Definable area]
+Pf = 30H : 6x8 dot  (Pd=6 byte) 
+Pf = 31H : 8x16 dot  (Pd=16 byte) 
+Pf = 32H : 12x24 dot  (Pd=36 byte) 
+Pf = 33H : 16x32 dot  (Pd=64 byte) 
+Pf = 34H : 16x16 dot  (Pd=32 byte) 
+Pf = 35H : 24x24 dot  (Pd=72 byte) 
+Pf = 36H : 32x32 dot  (Pd=128 byte) 
+cL = ANK code (Pf=30H~33H : 1 byte code) 
+cL,cH = Shift-JIS code (Pf=34H~36H : 2 byte code)
+*/
+void GP1212A02A::SendCommandDefineCharacter(TFontSize aFontSize, unsigned short aCharacterCode, unsigned char* aPixels)
+	{
+	unsigned char reportSize=0;
+	unsigned char headerSize=0;
+	unsigned char dataSize=CharacterSizeInBytes(aFontSize);
+	FutabaVfdReport report;
+
+	if (aFontSize>=EFont16x16)
+	{
+		//16 bits char code
+		headerSize=8;
+		reportSize = (dataSize<=report.Size()-headerSize?dataSize+0x06:64); //Report length. -7 is for our header first 7 bytes. +5 is for our Futaba header size
+		report[7] = aCharacterCode>>8;	
+	}
+	else
+	{
+		//8 bits char code
+		headerSize=7;
+		reportSize = (dataSize<=report.Size()-headerSize?dataSize+0x05:64); //Report length. -7 is for our header first 7 bytes. +5 is for our Futaba header size
+	}
+
+	
+    report[0]=0x00; //Report ID
+    report[1]=reportSize; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x6A; //Command ID
+    report[4]=0x47; //Command ID
+    report[5]=aFontSize; //
+	report[6] = (unsigned char) aCharacterCode;
+	//7th byte was set above already
+	int sizeWritten=MIN(dataSize,report.Size()-headerSize);
+    memcpy(report.Buffer()+headerSize, aPixels, sizeWritten);
+    Write(report);
+
+    int remainingSize=dataSize;
+    //We need to keep on sending our pixel data until we are done
+    while (report[1]==64)
+        {
+        report.Reset();
+        remainingSize-=sizeWritten;
+        report[0]=0x00; //Report ID
+        report[1]=(remainingSize<=report.Size()-2?remainingSize:64); //Report length, should be 64 or the remaining size
+        sizeWritten=(report[1]==64?63:report[1]);
+        memcpy(report.Buffer()+2, aPixels+(dataSize-remainingSize), sizeWritten);
+        Write(report);
+        }
+	}
+
+
+/**
+User definable font store / transfer / delete 
+[Code] 1BH,6AH,45H,Ps
+[Function] Store, transfer, or delete the User definable font to FROM.  
+* Define the user definable font, after the user definable font is stored 
+* The user definable font store is stored the all defined user definable font data. 
+* The use definable font delete is deleted the all defined to FROM and RAM user definable font data. 
+Ps = store / transfer / delete 
+[Definable area]
+Ps = 30H : Store
+Ps = 31H : Transfer
+Ps = 32H : Delete
+*/
+
+void GP1212A02A::SendCommandFontAction(TFontAction aFontAction)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x6A; //Command ID
+    report[4]=0x45; //Command ID
+    report[5]=aFontAction; //Ps
 
     Write(report);
 	}
