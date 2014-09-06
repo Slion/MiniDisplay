@@ -114,19 +114,41 @@ private:
 		EClockLarge		=	0x33
 	};
 
+	enum TFontSize
+	{
+		EFont6x8	= 0x30,
+		EFont8x16	= 0x31,
+		EFont12x24	= 0x32,
+		EFont16x32	= 0x33,
+		EFont16x16	= 0x34,
+		EFont24x24	= 0x35,
+		EFont32x32	= 0x36
+	};
+
+	enum TFontAction
+	{
+		EFontStore		= 0x30,
+		EFontTransfer	= 0x31,
+		EFontDelete		= 0x32
+	};
+
 
 private:
 	//Specific to GP1212A02A
 	//General setting command
 	void SendCommandClear();
+	void SendCommandReset();
 	//
 	void BmpDataInput(TTarget aTarget, unsigned short aAddress, TDirection aDirection, unsigned short aSize, unsigned char* aPixels);
 	//
 	void SendCommandPower(TPowerStatus aPowerStatus);
 	//Clock commands
 	void SendCommandClockSetting(TWeekDay aWeekDay, unsigned char aHour, unsigned char aMinute);
-	void SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize);
+	void SendCommandClockDisplay(TClockFormat aClockFormat, unsigned short aAddress, TClockSize aSize);	
 	void SendCommandClockCancel();
+	//Font commands
+	void SendCommandDefineCharacter(TFontSize aFontSize, unsigned short aCharacterCode, unsigned char* aPixelData);
+	void SendCommandFontAction(TFontAction aFontAction);
 
 
 	//BMP box
@@ -140,6 +162,8 @@ private:
 	int ClockCharWidthInPixels(TClockSize aSize);
 	int ClockCharHeightInPixels(TClockSize aSize);
 	unsigned short ClockCenterAddress(TClockFormat aFormat, TClockSize aSize);
+	//Font utilities
+	int CharacterSizeInBytes(TFontSize aFontSize);
 
 private:
     void RequestDeviceId();
