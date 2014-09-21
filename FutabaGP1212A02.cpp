@@ -221,16 +221,19 @@ void GP1212A02A::BmpBoxSelect(TBmpBoxId aBoxId)
 
 /**
 */
-void GP1212A02A::SetPixel(unsigned char aX, unsigned char aY, bool aOn)
+void GP1212A02A::SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel)
 	{
 	//
 	//int byteOffset=(aX*HeightInPixels()+aY)/8;
 	//int bitOffset=(aX*HeightInPixels()+aY)%8;
     //iNextFrame[byteOffset] |= ( (aOn?0x01:0x00) << bitOffset );
 
+	//Pixel is on if any of the non-alpha component is not null
+	bool on = (aPixel&0x00FFFFFF)!=0x00000000;
+
     if (iOffScreenMode)
         {
-        if (aOn)
+        if (on)
             {
             iFrameNext->SetBit(aX*HeightInPixels()+aY);
             }

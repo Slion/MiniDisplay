@@ -107,7 +107,7 @@ Set our given pixel.
 @param [IN] Pixel Y coordinate.
 @param [IN] Pixel value.
 */
-extern "C" MDAPI void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue);
+extern "C" MDAPI void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, unsigned int aPixel);
 
 //TODO: Have an API to specify pixel depth
 

@@ -152,10 +152,10 @@ int MiniDisplayHeightInPixels(MiniDisplayDevice aDevice)
 	}
 
 //-------------------------------------------------------------
-void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, int aValue)
+void MiniDisplaySetPixel(MiniDisplayDevice aDevice, int aX, int aY, unsigned int aPixel)
 	{
 	//aValue&=0x00FFFFFF; //Filter out alpha component
-	return ((GraphicDisplay*)aDevice)->SetPixel(aX,aY,aValue);
+	return ((GraphicDisplay*)aDevice)->SetPixel(aX,aY,aPixel);
 	}
 
 //-------------------------------------------------------------
