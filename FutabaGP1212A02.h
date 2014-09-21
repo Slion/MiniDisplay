@@ -35,7 +35,7 @@ public:
 
 
 	//From GraphicDisplay
-	virtual void SetPixel(unsigned char aX, unsigned char aY, bool aOn);
+	virtual void SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
 	virtual void SetBrightness(int aBrightness);
