@@ -502,12 +502,17 @@ void GP1212A02A::SwapBuffers()
 		{
 		//Send pixel directly into BMP box
 		//BmpBoxDataInput(FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		
+		//This appears to be the fastest scheme when running on our HTPC
 		//Send pixel data directly into the display window
-		//BmpDataInput(ETargetDisplayWindow,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		BmpDataInput(ETargetDisplayWindow,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
+		
 		//Send pixel data first to Data Memory then copy into the selected BMP box	
 		//BmpDataInput(ETargetDataMemory,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
 		//BmpBoxDataMemoryTransfer(0x0000);
-		//Send pixel data first to Data Memory then copy into the selected BMP box, cycling through our Data Memory frmae
+		
+		//Send pixel data first to Data Memory then copy into the selected BMP box, cycling through our Data Memory frame
+#if 0
 		BmpDataInput(ETargetDataMemory,iNextFrameAddress,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
 		BmpBoxDataMemoryTransfer(iNextFrameAddress);
 		iNextFrameAddress+=KFrameSizeInBytes;
@@ -515,6 +520,7 @@ void GP1212A02A::SwapBuffers()
 		{
 			iNextFrameAddress=0x0000;
 		}
+#endif
 
         //Cycle through our frame buffers
         //We keep track of previous frame which is in fact our device back buffer.
