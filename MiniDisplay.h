@@ -27,9 +27,10 @@ typedef void* MiniDisplayDevice;
 
 typedef enum
     {
-	EMiniDisplayAutoDetect=0, /*Not yet implemented*/
+	EMiniDisplayAutoDetect=0,
     EMiniDisplayFutabaGP1212A01,
     EMiniDisplayFutabaGP1212A02,
+	EMiniDisplayFutabaMDM166AA,
 	EMiniDisplayAutoDetectFailed
     }
 TMiniDisplayType;
@@ -43,9 +44,36 @@ typedef enum
     }
 TMiniDisplayRequest;
 
-//Open & Close functions
+/**
+Attempt to establish a connection to with a display of the given type.
+Supports display auto-detection too.
+
+@param [IN] The display type we want to connect to.
+@return Handle to the device we connected to on success, null otherwise.
+*/
 extern "C" MDAPI MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType);
+
+/**
+Close the connection with the given display device.
+
+@param [IN] The device to apply this command to.
+*/
 extern "C" MDAPI void MiniDisplayClose(MiniDisplayDevice aDevice);
+
+/**
+Provides the number of display types supported.
+That includes the pseudo 'Auto-Detect' display.
+@return The number of display type supported.
+*/
+extern "C" MDAPI int MiniDisplayTypeCount();
+
+/**
+Provides the human readable name of the given display type.
+
+@param [IN] The display type we want to get the name for.
+@return The name of the given display type.
+*/
+extern "C" MDAPI wchar_t* MiniDisplayTypeName(TMiniDisplayType aType);
 
 /**
 Clear our MiniDisplay.

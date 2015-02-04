@@ -28,9 +28,12 @@ const int KFutabaMaxHidReportSize = 65;
 const int KHidReportIdIndex=0;
 const int KFutabaHidReportSizeIndex=1;
 //Define Futaba vendor ID to filter our list of device
+const unsigned short KTargaVendorId = 0x19C2;
 const unsigned short KFutabaVendorId = 0x1008;
 const unsigned short KFutabaProductIdGP1212A01A = 0x100C;
 const unsigned short KFutabaProductIdGP1212A02A = 0x1015;
+const unsigned short KFutabaProductIdMDM166AA = 0x6A11;
+
 
 //typedef struct hid_device_info HidDeviceInfo;
 
