@@ -4,6 +4,14 @@
 #include "FutabaGP1212A02.h"
 
 
+wchar_t* KDisplayNames[]=
+	{
+	L"Auto-Detect",
+	L"Futaba GP1212A01",
+	L"Futaba GP1212A02",
+	L"Unknown display device"
+	};
+
 MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType, bool aAutoDetect)
 	{
 	GraphicDisplay* device=NULL;
@@ -54,13 +62,28 @@ MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType)
 	}
 
 
-
-
 //
 
 void MiniDisplayClose(MiniDisplayDevice aDevice)
 	{
 	delete ((GraphicDisplay*)aDevice);
+	}
+
+
+int MiniDisplayTypeCount()
+	{
+	return EMiniDisplayAutoDetectFailed;
+	}
+
+
+wchar_t* MiniDisplayTypeName(TMiniDisplayType aType)
+	{
+		if (aType>=EMiniDisplayAutoDetectFailed)
+		{
+			return KDisplayNames[EMiniDisplayAutoDetectFailed];
+		}
+
+		return KDisplayNames[aType];
 	}
 
 
