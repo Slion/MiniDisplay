@@ -11,7 +11,7 @@ const unsigned short KMaxDataMemoryAddress = 0x4FFF;
 const unsigned short KFrameSizeInBytes = 0x800;
 
 
-void sleep(unsigned int mseconds)
+static void sleep(unsigned int mseconds)
 	{
     clock_t goal = mseconds + clock();
     while (goal > clock());

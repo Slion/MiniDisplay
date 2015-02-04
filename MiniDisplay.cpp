@@ -2,13 +2,18 @@
 #include "MiniDisplay.h"
 #include "FutabaGP1212A01.h"
 #include "FutabaGP1212A02.h"
+#include "FutabaMDM166AA.h"
 
-
+/**
+Make sure you update this list when adding a new display.
+The order has to match the one from TMiniDisplayType.
+*/
 wchar_t* KDisplayNames[]=
 	{
 	L"Auto-Detect",
 	L"Futaba GP1212A01",
 	L"Futaba GP1212A02",
+	L"Futaba MDM166AA",
 	L"Unknown display device"
 	};
 
@@ -25,6 +30,10 @@ MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType, bool aAutoDetect)
 		
 	case EMiniDisplayFutabaGP1212A02:
 		device=new GP1212A02A();
+		break;
+
+	case EMiniDisplayFutabaMDM166AA:
+		device=new MDM166AA();
 		break;
 
 	case EMiniDisplayAutoDetectFailed:

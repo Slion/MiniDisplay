@@ -30,7 +30,7 @@ typedef enum
 	EMiniDisplayAutoDetect=0,
     EMiniDisplayFutabaGP1212A01,
     EMiniDisplayFutabaGP1212A02,
-	//EMiniDisplayFutabaMDM166AA,
+	EMiniDisplayFutabaMDM166AA,
 	EMiniDisplayAutoDetectFailed
     }
 TMiniDisplayType;
