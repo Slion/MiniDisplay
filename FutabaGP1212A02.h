@@ -6,14 +6,17 @@
 #define FUTABA_GP1212A02_H
 
 #include "FutabaGP1212.h"
-
-#include "FutabaGP1212.h"
 #include "FutabaVfd.h"
 
 /**
-GP1212A01A is a graphic display module using a FUTABA 256x64dots VFD.
-The module do not include character ROM, the customer will compile the character
-by themselves (from main system). 
+GP1212A02A is a graphic display module using a FUTABA 256x64dots VFD.
+The module will support the interface of I2C, RS-232C and USB2.0 communications.
+The module include flash ROM (4Mbyte), the customer will definable the BMP data and download
+character.
+It realizes displaying a Japanese font (refer to Table-24) and BMP by I2C, RS-232C or USB2.0
+communications. Other font tables (ex. Chinese, Korean, European and custom font) can be appended to
+flash ROM.
+Since a DC/DC converter is included, 5V power source is required to operate the module.
 */
 class GP1212A02A : public GP1212XXXX
 	{
