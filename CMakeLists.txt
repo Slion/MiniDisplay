@@ -15,6 +15,7 @@ set(SOURCES		BitArray.cpp
 				FutabaGP1212.cpp
 				FutabaGP1212A01.cpp
 				FutabaGP1212A02.cpp
+				FutabaMDM166AA.cpp
 				HidDevice.cpp
 				MiniDisplay.cpp
 				../../GitHub/hidapi/windows/hid.c)
@@ -26,6 +27,7 @@ set(INCLUDES	BitArray.h
 				FutabaGP1212.h
 				FutabaGP1212A01.h
 				FutabaGP1212A02.h
+				FutabaMDM166AA.h
 				HidDevice.h
 				HidReport.h
 				MiniDisplay.h
