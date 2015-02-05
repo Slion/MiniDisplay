@@ -20,7 +20,7 @@ Common functionality between GP1212A01A and GP1212A02A
 class GP1212XXXX : public FutabaGraphicDisplay
 	{
 public:
-	//From FutabaVfd
+	//From GraphicDisplay
     virtual int MinBrightness() const {return 0;}
     virtual int MaxBrightness() const {return 5;}
     virtual int WidthInPixels() const {return KGP12xWidthInPixels;}

@@ -51,9 +51,6 @@ public:
 	void ToggleOffScreenMode();
     void SetOffScreenMode(bool aOn);
     bool OffScreenMode() const {return iOffScreenMode;}
-    //    
-    TMiniDisplayRequest AttemptRequestCompletion();
-
 
 private:
 

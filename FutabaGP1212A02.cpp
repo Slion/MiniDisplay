@@ -31,8 +31,7 @@ GP1212A02A::GP1212A02A():
     iFrameAlpha(NULL),
     iFrameBeta(NULL),
     iFrameGamma(NULL),
-    iNeedFullFrameUpdate(0),
-    iPowerOn(false)
+    iNeedFullFrameUpdate(0)
 	{
 	iDeviceId[0]=0;
 	iFirmwareRevision[0]=0;
@@ -719,27 +718,6 @@ void GP1212A02A::SetBrightness(int aBrightness)
     report[5]=0x30+aBrightness; //Brightness level
     Write(report);
     }
-
-/**
-*/
-bool GP1212A02A::IsPowerOn()
-	{
-	return iPowerOn;
-	}
-
-/**
-*/
-char* GP1212A02A::DeviceId()
-	{
-	return iDeviceId;
-	}
-
-/**
-*/
-char* GP1212A02A::FirmwareRevision()
-	{
-	return iFirmwareRevision;
-	}
 
 /**
 VFD Power ON/OFF 

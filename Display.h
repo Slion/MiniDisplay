@@ -29,6 +29,7 @@ public:
 	virtual int MinBrightness() const=0;
 	virtual int MaxBrightness() const=0;
 	virtual void SetBrightness(int aBrightness)=0;
+	//
 	virtual void Clear()=0;
 	virtual void Fill()=0;
 	//
@@ -36,7 +37,7 @@ public:
 
 	//Request management
 	virtual void Request(TMiniDisplayRequest /*aRequest*/){ /*No request supported by default*/ };
-	virtual TMiniDisplayRequest AttemptRequestCompletion()=0;
+	virtual TMiniDisplayRequest AttemptRequestCompletion(){return EMiniDisplayRequestNone;};
 	
 	virtual TMiniDisplayRequest CurrentRequest(){return iRequest;}
     virtual void CancelRequest(){iRequest=EMiniDisplayRequestNone;}
