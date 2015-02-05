@@ -253,5 +253,22 @@ Specifies whether or not this display supports clock functions.
 extern "C" MDAPI bool MiniDisplaySupportClock(MiniDisplayDevice aDevice);
 
 
+extern "C" MDAPI int MiniDisplayIconNetworkCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconEmailCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconMuteCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconVolumeCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconPlayCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconPauseCount(MiniDisplayDevice aDevice);
+extern "C" MDAPI int MiniDisplayIconRecordingCount(MiniDisplayDevice aDevice);
+//
+extern "C" MDAPI void MiniDisplaySetIconNetwork(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconEmail(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconMute(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconVolume(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconPlay(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconPause(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+extern "C" MDAPI void MiniDisplaySetIconRecording(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+
+
 #endif
 
