@@ -82,14 +82,15 @@ private:
 	//General setting command
 	void SendCommandClear();
 	void SendCommandReset();
-	void SendCommandSetAddressCounter(unsigned char aAddressCounter);
-	//void SendCommandWriteGraphicData();
 	//
 	//Clock commands
 	void SendCommandClockSetting(unsigned char aHour, unsigned char aMinute);
 	void SendCommandClockDisplay(TClockSize aClockSize, TClockFormat aClockFormat);	
 
-	void SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char* aPixels);
+	//Graphics commands
+	void SendCommandSetAddressCounter(unsigned char aAddressCounter);
+	void SendCommandWriteGraphicData(int aSize, unsigned char* aPixels);
+
 
 private:
     void RequestDeviceId();

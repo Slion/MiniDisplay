@@ -95,45 +95,6 @@ int MDM166AA::Open()
 	return success;
 	}
 
-
-/**
-Display RAM filled with 00H.
-Address Counter is set by 00H.
-Dimming is set to 50%.
-*/
-void MDM166AA::SendCommandReset()
-	{
-	FutabaVfdReport report;
-	report[0]=0x00; //Report ID
-	report[1]=0x01; //Report length.
-	report[2]=0x1F; //Command ID
-	Write(report);
-	//Wait until reset is done. Is that needed?
-	//sleep(2000);
-	}
-
-
-/**
-Set Address Counter (AC) values: 1BH + 60H + xxH
-xxH: 00 ~ BFH
-AC value represents the start address for graphic data.
-There are 192 bytes as display RAM. It can be set on anywhere even if AC value is not visible area.
-The default value is 00H.
-Default: 00H
-When clock is displayed, AC value is set 00H.
-*/
-void MDM166AA::SendCommandSetAddressCounter(unsigned char aAddressCounter)
-	{
-	FutabaVfdReport report;
-	report[0]=0x00; //Report ID
-	report[1]=0x03; //Report length.
-	report[2]=0x1B; //Command ID
-	report[3]=0x60; //Command ID
-	report[4]=aAddressCounter;
-	Write(report);
-	}
-
-
 /**
 */
 void MDM166AA::SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel)
@@ -266,16 +227,7 @@ void MDM166AA::SwapBuffers()
 	if (OffScreenMode())
 		{
 		//Send pixel directly into BMP box
-		//BmpBoxDataInput(FrameBufferSizeInBytes(),iFrameNext->Ptr());
-		//Send pixel data directly into the display window
-		//BmpDataInput(ETargetDisplayWindow,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
-		//Send pixel data first to Data Memory then copy into the selected BMP box	
-		//BmpDataInput(ETargetDataMemory,0x0000,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
-		//BmpBoxDataMemoryTransfer(0x0000);
-		//Send pixel data first to Data Memory then copy into the selected BMP box, cycling through our Data Memory frmae
-		//BmpDataInput(ETargetDataMemory,iNextFrameAddress,EDirectionY, FrameBufferSizeInBytes(),iFrameNext->Ptr());
-		//BmpBoxDataMemoryTransfer(iNextFrameAddress);
-
+		SendCommandWriteGraphicData(FrameBufferSizeInBytes(),iFrameNext->Ptr());
 
         //Cycle through our frame buffers
         //We keep track of previous frame which is in fact our device back buffer.
@@ -291,48 +243,6 @@ void MDM166AA::SwapBuffers()
         iFrameNext = previousFrame;
 		}
 	}
-
-
-/**
-Set the defined pixel block to the given value.
-@param X coordinate of our pixel block starting point.
-@param Y coordinate of our pixel block starting point.
-@param The height of our pixel block.
-@param The size of our pixel data. Number of pixels divided by 8.
-@param Pointer to our pixel data.
-*/
-void MDM166AA::SetPixelBlock(unsigned char aX, unsigned char aY, int aHeight, int aSize, unsigned char* aPixels)
-    {
-	//TODO: Assuming 0,0 for now, do the math later
-	SendCommandSetAddressCounter(0);
-
-	const int KMaxPixelBytes=48;
-
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=(aSize<=report.Size()-10?aSize+0x08:64); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size
-    report[2]=0x1B; //Command ID
-    report[3]=0x70; //Command ID
-	//TODO: All rubbish
-	report[4]=MAX(KMaxPixelBytes,aSize); //Size of pixel data in bytes
-    int sizeWritten=MIN(aSize,report.Size()-10);
-    memcpy(report.Buffer()+10, aPixels, sizeWritten);
-    Write(report);
-
-    int remainingSize=aSize;
-    //We need to keep on sending our pixel data until we are done
-    while (report[1]==64)
-        {
-        report.Reset();
-        remainingSize-=sizeWritten;
-        report[0]=0x00; //Report ID
-        report[1]=(remainingSize<=report.Size()-2?remainingSize:64); //Report length, should be 64 or the remaining size
-        sizeWritten=(report[1]==64?63:report[1]);
-        memcpy(report.Buffer()+2, aPixels+(aSize-remainingSize), sizeWritten);
-        Write(report);
-        }
-    }
-
 
 
 //Define the edge of our pixel block
@@ -612,3 +522,77 @@ void MDM166AA::SendCommandClockDisplay(TClockSize aClockSize, TClockFormat aCloc
     Write(report);
 	}
 
+
+/**
+Display RAM filled with 00H.
+Address Counter is set by 00H.
+Dimming is set to 50%.
+*/
+void MDM166AA::SendCommandReset()
+	{
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+	report[1]=0x01; //Report length.
+	report[2]=0x1F; //Command ID
+	Write(report);
+	//Wait until reset is done. Is that needed?
+	//sleep(2000);
+	}
+
+
+/**
+Set Address Counter (AC) values: 1BH + 60H + xxH
+xxH: 00 ~ BFH
+AC value represents the start address for graphic data.
+There are 192 bytes as display RAM. It can be set on anywhere even if AC value is not visible area.
+The default value is 00H.
+Default: 00H
+When clock is displayed, AC value is set 00H.
+*/
+void MDM166AA::SendCommandSetAddressCounter(unsigned char aAddressCounter)
+	{
+	FutabaVfdReport report;
+	report[0]=0x00; //Report ID
+	report[1]=0x03; //Report length.
+	report[2]=0x1B; //Command ID
+	report[3]=0x60; //Command ID
+	report[4]=aAddressCounter;
+	Write(report);
+	}
+
+
+/**
+Set the defined pixel block to the given value.
+
+@param The size of our pixel data. Number of pixels divided by 8.
+@param Pointer to our pixel data.
+*/
+void MDM166AA::SendCommandWriteGraphicData(int aSize, unsigned char* aPixels)
+    {
+	//TODO: Remove that at some point
+	SendCommandSetAddressCounter(0);
+
+	const int KMaxPixelBytes=48;
+	const int KHeaderSize=3;
+	
+	int remainingSize=aSize;
+	int sizeWritten=0;
+
+	while (remainingSize>0)
+		{
+		//Only send a maximum of 48 bytes worth of pixels per report
+		const int KPixelDataSize=(remainingSize<=KMaxPixelBytes?remainingSize:KMaxPixelBytes);
+
+		FutabaVfdReport report;
+		report[0]=0x00; //Report ID
+		report[1]=KPixelDataSize+KHeaderSize; //Report length. +3 is for our header first 3 bytes.
+		report[2]=0x1B; //Command ID
+		report[3]=0x70; //Command ID
+		report[4]=KPixelDataSize; //Size of pixel data in bytes		
+		memcpy(report.Buffer()+5, aPixels+sizeWritten, KPixelDataSize);
+		Write(report);
+		//Advance
+		sizeWritten+=KPixelDataSize;
+		remainingSize-=KPixelDataSize;
+		}
+    }
