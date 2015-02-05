@@ -86,6 +86,13 @@ int MDM166AA::Open()
 		//We don't set clock data here as it turns on clock display too and cause an unpleasant clock flash
 		//Only side effect from not doing this here is that for at most one minute the first time you cold boot your display the time should be wrong.
 		//SetClockData();
+
+		//Turns mast ON
+		//SetIconNetwork(0,EIconOn);
+		//Show volume label
+		//SendCommandSymbolControl(EIconVolumeLabel,EIconOn);
+		//Icon checks
+		//SetAllIcons(EIconOn);
 		}
 	return success;
 	}
@@ -128,6 +135,7 @@ void MDM166AA::Clear()
     {
 	//That one also clear the symbols
     SetAllPixels(0x00);
+	SendCommandClear(); //Clear icons too
     }
 
 /**
@@ -381,6 +389,136 @@ void MDM166AA::HideClock()
 
 
 /**
+*/
+void MDM166AA::SetIconNetwork(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconNetworkCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconNetworkMast),(aStatus==0?EIconOff:EIconOn));
+	}
+
+/**
+*/
+void MDM166AA::SetIconEmail(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconEmailCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconEnvelop),(aStatus==0?EIconOff:EIconOn));
+	}
+
+/**
+*/
+void MDM166AA::SetIconMute(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconMuteCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconMute),(aStatus==0?EIconOff:EIconOn));
+	}
+
+/**
+*/
+void MDM166AA::SetIconVolume(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconVolumeCount())
+		{
+		//Out of range
+		return;
+		}
+
+	if (aStatus<EIconOff||aStatus>EIconOn)
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconVolumeLevel01),(TIconStatus)aStatus);
+	}
+
+
+/**
+*/
+void MDM166AA::SetIconPlay(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconPlayCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconPlay),(aStatus==0?EIconOff:EIconOn));
+	}
+
+
+/**
+*/
+void MDM166AA::SetIconPause(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconPauseCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconPause),(aStatus==0?EIconOff:EIconOn));
+	}
+
+
+/**
+*/
+void MDM166AA::SetIconRecording(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=IconRecordingCount())
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconRecording),(aStatus==0?EIconOff:EIconOn));
+	}
+
+/**
+Set all our icons to the corresponding status.
+*/
+void MDM166AA::SetAllIcons(TIconStatus aStatus)
+	{
+	for (int i=EIconFirst;i<=EIconLast;i++)
+		{
+		SendCommandSymbolControl((TIconId)i,aStatus);
+		}
+	}
+
+/**
+Symbols control
+Segment On/Off and Grayscale/Brightness
+[Code]1BH,30H,Ps,Pb
+*/
+void MDM166AA::SendCommandSymbolControl(TIconId aIconId, TIconStatus aStatus)
+	{
+	FutabaVfdReport report;
+    report[0]=0x00; //Report ID
+    report[1]=0x04; //Report size
+    report[2]=0x1B; //Command ID
+    report[3]=0x30; //Command ID
+	report[4]=aIconId;
+	report[5]=aStatus;
+
+    Write(report);
+	}
+
+
+/**
 Clock setting 
 [Code]1BH,00H,Pm,Ph 
 [Function]Setting the clock data. The setting data is cleared, if the Reset command is input or power is turned off.
@@ -403,7 +541,6 @@ void MDM166AA::SendCommandSetClockData(unsigned char aHour, unsigned char aMinut
 
     Write(report);
 	}
-
 
 /**
 Set display clock data according to local system time.
@@ -467,6 +604,7 @@ void MDM166AA::SendCommandClockDisplay(TClockSize aClockSize, TClockFormat aCloc
 Display RAM filled with 00H.
 Address Counter is set by 00H.
 Dimming is set to 50%.
+Turn off all icons segments.
 */
 void MDM166AA::SendCommandReset()
 	{
@@ -475,8 +613,6 @@ void MDM166AA::SendCommandReset()
 	report[1]=0x01; //Report length.
 	report[2]=0x1F; //Command ID
 	Write(report);
-	//Wait until reset is done. Is that needed?
-	//sleep(2000);
 	}
 
 

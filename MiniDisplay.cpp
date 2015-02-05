@@ -291,3 +291,87 @@ bool MiniDisplaySupportClock(MiniDisplayDevice aDevice)
     {
     return ((GraphicDisplay*)aDevice)->SupportClock();
     }
+
+//-------------------------------------------------------------
+int MiniDisplayIconNetworkCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconNetworkCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconEmailCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconEmailCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconMuteCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconMuteCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconVolumeCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconVolumeCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconPlayCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconPlayCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconPauseCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconPauseCount();
+    }
+
+//-------------------------------------------------------------
+int MiniDisplayIconRecordingCount(MiniDisplayDevice aDevice)
+	{
+    return ((GraphicDisplay*)aDevice)->IconRecordingCount();
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconNetwork(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconNetwork(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconEmail(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconEmail(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconMute(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconMute(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconVolume(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconVolume(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconPlay(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconPlay(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconPause(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconPause(aIndex,aStatus);
+    }
+
+//-------------------------------------------------------------
+void MiniDisplaySetIconRecording(MiniDisplayDevice aDevice, int aIndex, int aStatus)
+    {
+    ((GraphicDisplay*)aDevice)->SetIconRecording(aIndex,aStatus);
+    }
