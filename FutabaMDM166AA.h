@@ -76,25 +76,26 @@ private:
 	//Clock commands
 	void SendCommandSetClockData(unsigned char aHour, unsigned char aMinute);
 	void SendCommandClockDisplay(TClockSize aClockSize, TClockFormat aClockFormat);	
+	void AttemptClockSynchronization();
 
 	//Graphics commands
 	void SendCommandSetAddressCounter(unsigned char aAddressCounter);
 	void SendCommandWriteGraphicData(int aSize, unsigned char* aPixels);
 
-private:
     void RequestDeviceId();
     void RequestFirmwareRevision();
     void RequestPowerSupplyStatus();
 	//
 	void SetClockData();
-
-private:
+	//
 	void ResetBuffers();
 
 private:
 	///Off screen mode is the recommended default settings to avoid tearing.
 	///Though turning it off can be useful for debugging
 	bool iOffScreenMode;
+	///We use this flag to align display clock seconds with system time
+	bool iNeedAccurateClockData;
     //
 	BitArrayLow* iFrameNext;
     BitArrayLow* iFrameCurrent;
