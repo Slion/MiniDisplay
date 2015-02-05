@@ -20,17 +20,13 @@ static void sleep(unsigned int mseconds)
 //
 
 MDM166AA::MDM166AA():
-	iDisplayPositionX(0),iDisplayPositionY(0),
     iOffScreenMode(true),
-    iUseFrameDifferencing(true),
     iFrameNext(NULL),
     iFrameCurrent(NULL),
     iFramePrevious(NULL),
     iFrameAlpha(NULL),
     iFrameBeta(NULL),
-    iFrameGamma(NULL),
-    iNeedFullFrameUpdate(0),
-    iPowerOn(false)
+    iFrameGamma(NULL)
 	{
 	iDeviceId[0]=0;
 	iFirmwareRevision[0]=0;
@@ -53,8 +49,6 @@ MDM166AA::~MDM166AA()
     iFrameNext=NULL;
     iFrameCurrent=NULL;
     iFramePrevious=NULL;
-    //
-    iNeedFullFrameUpdate=0;
 	}
 
 /**
@@ -80,16 +74,12 @@ int MDM166AA::Open()
         iFrameNext=iFrameAlpha;
         iFrameCurrent=iFrameBeta;
         iFramePrevious=iFrameGamma;
-
-
-        //To make sure it is synced properly
-        iNeedFullFrameUpdate=0;
         //
 		SetNonBlocking(1);
 		//
-		SendCommandClear();
+		SendCommandReset();
 		//
-		SetClockSetting();
+		ShowClock();
 
 		}
 	return success;
@@ -148,8 +138,7 @@ Call to SwapBuffers must follow to actually clear the display.
 void MDM166AA::Clear()
     {
 	//That one also clear the symbols
-    SendCommandClear();
-	//TODO: Consider just clearing the pixels instead
+    SetAllPixels(0x00);
     }
 
 /**
@@ -207,16 +196,6 @@ void MDM166AA::SendCommandClear()
 	Write(report);
 	}
 
-
-/**
-Provide Y coordinate of our off screen buffer.
-*/
-unsigned char MDM166AA::OffScreenY() const
-	{
-	//Overflowing is fine this is just what we want
-	return iDisplayPositionY+HeightInPixels();
-	}
-
 /**
 Put our off screen buffer on screen.
 On screen buffer goes off screen.
@@ -226,7 +205,9 @@ void MDM166AA::SwapBuffers()
 	//Only perform buffer swapping if off screen mode is enabled
 	if (OffScreenMode())
 		{
-		//Send pixel directly into BMP box
+		//Send next frame to our display RAM
+		//We could attempt to implement a frame differencing algorithm much like we did for GP1212A01.
+		//However we see little point doing that since we already run at above 20 FPS.
 		SendCommandWriteGraphicData(FrameBufferSizeInBytes(),iFrameNext->Ptr());
 
         //Cycle through our frame buffers
@@ -251,19 +232,6 @@ void MDM166AA::SwapBuffers()
 const int KPixelBlockEdge = 32;
 const int KPixelBlockSizeInBits = KPixelBlockEdge*KPixelBlockEdge;
 const int KPixelBlockSizeInBytes = KPixelBlockSizeInBits/8;
-
-
-/**
-Translate the given pixel coordinate according to our off screen mode.
-*/
-void MDM166AA::OffScreenTranslation(unsigned char& aX, unsigned char& aY)
-	{
-	if (OffScreenMode())
-		{
-		aX+=WidthInPixels()-iDisplayPositionX;
-		aY+=HeightInPixels()-iDisplayPositionY;
-		}
-	}
 
 
 /**
@@ -305,32 +273,10 @@ void MDM166AA::RequestDeviceId()
     }
 
 /**
-ID code 
-[Code] 1BH,6AH,49H,44H
-[Function] Send the ID code to the Host system. ID code is software version.
 */
 void MDM166AA::RequestFirmwareRevision()
     {
-    if (RequestPending())
-        {
-        //Abort silently for now
-        return;
-        }
-
-    //1BH,6AH,49H,44H
-    //Send Software Revision Read Command
-    FutabaVfdReport report;
-    report[0]=0x00; //Report ID
-    report[1]=0x04; //Report length
-    report[2]=0x1B; //Command ID
-    report[3]=0x6A; //Command ID
-    report[4]=0x49; //Command ID
-    report[5]=0x44; //Command ID
-    if (Write(report)==report.Size())
-        {
-        SetRequest(EMiniDisplayRequestFirmwareRevision);
-        }
-
+	//Not supported
     }
 
 /**
@@ -376,31 +322,7 @@ Tries to complete our current request if we have one pending.
  */
 TMiniDisplayRequest MDM166AA::AttemptRequestCompletion()
     {
-    if (!RequestPending())
-        {
-        return EMiniDisplayRequestNone;
-        }
-
-    int res=Read(iInputReport);
-
-    if (!res)
-        {
-        return EMiniDisplayRequestNone;
-        }
-
-    //Process our request
-	if (CurrentRequest()==EMiniDisplayRequestFirmwareRevision)
-		{
-			unsigned char* ptr=&iInputReport[2];
-			iInputReport[7]=0x00;
-			strcpy(iFirmwareRevision,(const char*)ptr);
-		}
-
-    TMiniDisplayRequest completed=CurrentRequest();
-    //Our request was completed
-    SetRequest(EMiniDisplayRequestNone);
-
-    return completed;
+	return EMiniDisplayRequestNone;
 	}
 
 
@@ -426,33 +348,13 @@ void MDM166AA::SetBrightness(int aBrightness)
     Write(report);
     }
 
-/**
-*/
-bool MDM166AA::IsPowerOn()
-	{
-	return iPowerOn;
-	}
-
-/**
-*/
-char* MDM166AA::DeviceId()
-	{
-	return iDeviceId;
-	}
-
-/**
-*/
-char* MDM166AA::FirmwareRevision()
-	{
-	return iFirmwareRevision;
-	}
 
 /**
 */
 void MDM166AA::ShowClock()
 	{
+	SetClockData();
 	SendCommandClockDisplay(EClockLarge,EClock24);
-	SetClockSetting();
 	}
 
 /**
@@ -471,7 +373,7 @@ Clock setting
 Ph = hour 
 Pm = minute 
 */
-void MDM166AA::SendCommandClockSetting(unsigned char aHour, unsigned char aMinute)
+void MDM166AA::SendCommandSetClockData(unsigned char aHour, unsigned char aMinute)
 	{
 	FutabaVfdReport report;
     report[0]=0x00; //Report ID
@@ -490,18 +392,36 @@ void MDM166AA::SendCommandClockSetting(unsigned char aHour, unsigned char aMinut
 
 
 /**
-Set display clock settings according to local system time.
+Set display clock data according to local system time.
 This needs to be redone whenever we open or turn on our display.
 */
-void MDM166AA::SetClockSetting()
+void MDM166AA::SetClockData()
 	{
 	time_t rawtime;
 	struct tm * timeinfo;
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	//
-	SendCommandClockSetting(timeinfo->tm_hour,timeinfo->tm_min);
+	//Adjust minute as best as we can so that we have a 30 seconds offset at most rather a than a full minute.
+	if (timeinfo->tm_sec>30)
+		{
+		//Use the next minute then
+		timeinfo->tm_min++;
+		if (timeinfo->tm_min==60)
+			{
+			//Use the next hour then
+			timeinfo->tm_hour++;
+			timeinfo->tm_min=0;
+			if (timeinfo->tm_hour==24)
+				{
+				//Move to the next day then
+				timeinfo->tm_hour=0;
+				}
+			}
+		}
+
+	//Send hours and minutes to our display
+	SendCommandSetClockData(timeinfo->tm_hour,timeinfo->tm_min);
 	}
 
 
