@@ -21,7 +21,6 @@ MDM166AA is a graphic display module using a FUTABA 96x16dots VFD.
 class MDM166AA : public FutabaGraphicDisplay
 	{
 public:
-
     MDM166AA();
     ~MDM166AA();
 
@@ -52,29 +51,23 @@ public:
 	void ToggleOffScreenMode();
     void SetOffScreenMode(bool aOn);
     bool OffScreenMode() const {return iOffScreenMode;}
-    //
-    void SetFrameDifferencing(bool aOn){iUseFrameDifferencing=aOn;}
-    bool FrameDifferencing() const {return iUseFrameDifferencing;}
     //    
     TMiniDisplayRequest AttemptRequestCompletion();
-    FutabaVfdReport& InputReport() {return iInputReport;}
-    bool IsPowerOn();
-	char* DeviceId();
-	char* FirmwareRevision();
+
 
 private:
 
 	enum TClockFormat
-	{
+		{
 		EClock12	=	0x00,
 		EClock24	=	0x01,
-	};
+		};
 
 	enum TClockSize
-	{
+		{
 		EClockSmall		=	0x01,
 		EClockLarge		=	0x02
-	};
+		};
 	
 
 private:
@@ -84,56 +77,35 @@ private:
 	void SendCommandReset();
 	//
 	//Clock commands
-	void SendCommandClockSetting(unsigned char aHour, unsigned char aMinute);
+	void SendCommandSetClockData(unsigned char aHour, unsigned char aMinute);
 	void SendCommandClockDisplay(TClockSize aClockSize, TClockFormat aClockFormat);	
 
 	//Graphics commands
 	void SendCommandSetAddressCounter(unsigned char aAddressCounter);
 	void SendCommandWriteGraphicData(int aSize, unsigned char* aPixels);
 
-
 private:
     void RequestDeviceId();
     void RequestFirmwareRevision();
     void RequestPowerSupplyStatus();
 	//
-	void SetClockSetting();
-
+	void SetClockData();
 
 private:
-	unsigned char OffScreenY() const;	
-	void OffScreenTranslation(unsigned char& aX, unsigned char& aY);
 	void ResetBuffers();
 
 private:
-	unsigned char iDisplayPositionX;
-	unsigned char iDisplayPositionY;
 	///Off screen mode is the recommended default settings to avoid tearing.
 	///Though turning it off can be useful for debugging
 	bool iOffScreenMode;
-    ///Frame differences algo is used to reduce USB bus traffic and improve frame rate in typical use case
-    bool iUseFrameDifferencing;
-	///
-	//FutabaVfdReport iReport;
-	///
-	//unsigned char iFrameBuffer[256*64];
-    BitArrayLow* iFrameNext;
+    //
+	BitArrayLow* iFrameNext;
     BitArrayLow* iFrameCurrent;
     BitArrayLow* iFramePrevious;
     //
-    BitArrayLow* iFrameAlpha;
-    BitArrayLow* iFrameBeta;
-    BitArrayLow* iFrameGamma;
-    //
-    int iNeedFullFrameUpdate;
-	//unsigned char iFrameBeta[256*64];
-	//unsigned char *iFrontBuffer;
-	//unsigned char *iBackBuffer;
-    FutabaVfdReport iInputReport;
-	//
-	char iDeviceId[KFutabaMaxHidReportSize];
-	char iFirmwareRevision[KFutabaMaxHidReportSize];
-    bool iPowerOn;
+    BitArrayLow* iFrameAlpha; //owned
+    BitArrayLow* iFrameBeta;  //owned
+    BitArrayLow* iFrameGamma; //owned
 	};
 
 
