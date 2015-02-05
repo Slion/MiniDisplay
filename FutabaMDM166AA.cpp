@@ -318,15 +318,6 @@ void MDM166AA::SetOffScreenMode(bool aOn)
     }
 
 /**
-Tries to complete our current request if we have one pending.
- */
-TMiniDisplayRequest MDM166AA::AttemptRequestCompletion()
-    {
-	return EMiniDisplayRequestNone;
-	}
-
-
-/**
 Set our screen brightness.
 @param The desired brightness level. Must be between MinBrightness and MaxBrightness.
 */

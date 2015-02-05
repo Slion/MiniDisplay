@@ -26,7 +26,7 @@ public:
     ~GP1212A02A();
 
 	//From DisplayBase
-	int Open();
+	virtual int Open();
 	virtual void SwapBuffers();
 	virtual void TurnPowerOn();
 	virtual void TurnPowerOff();
@@ -34,6 +34,11 @@ public:
 	virtual void ShowClock();
 	virtual void HideClock();
 	virtual bool SupportClock(){return true;}
+	virtual void SetBrightness(int aBrightness);
+	virtual void Clear();
+	virtual void Fill();
+    virtual TMiniDisplayRequest AttemptRequestCompletion();
+	virtual void Request(TMiniDisplayRequest aRequest);
 
 
 
@@ -41,12 +46,8 @@ public:
 	virtual void SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel);
 	virtual void SetAllPixels(unsigned char aPattern);
     virtual int FrameBufferSizeInBytes() const {return KGP12xFrameBufferSizeInBytes;}
-	virtual void SetBrightness(int aBrightness);
-	virtual void Clear();
-	virtual void Fill();
-	virtual void Request(TMiniDisplayRequest aRequest);
-
 	
+
 		
 	//
 	void ToggleOffScreenMode();
@@ -55,12 +56,7 @@ public:
     //
     void SetFrameDifferencing(bool aOn){iUseFrameDifferencing=aOn;}
     bool FrameDifferencing() const {return iUseFrameDifferencing;}
-    //    
-    TMiniDisplayRequest AttemptRequestCompletion();
     FutabaVfdReport& InputReport() {return iInputReport;}
-    bool IsPowerOn();
-	char* DeviceId();
-	char* FirmwareRevision();
 
 private:
 
@@ -203,14 +199,8 @@ private:
     BitArrayLow* iFrameGamma;
     //
     int iNeedFullFrameUpdate;
-	//unsigned char iFrameBeta[256*64];
-	//unsigned char *iFrontBuffer;
-	//unsigned char *iBackBuffer;
-    FutabaVfdReport iInputReport;
 	//
-	char iDeviceId[KFutabaMaxHidReportSize];
-	char iFirmwareRevision[KFutabaMaxHidReportSize];
-    bool iPowerOn;
+    FutabaVfdReport iInputReport;
 	//
 	unsigned short iNextFrameAddress;
 	};
