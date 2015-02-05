@@ -21,6 +21,7 @@ static void sleep(unsigned int mseconds)
 
 MDM166AA::MDM166AA():
     iOffScreenMode(true),
+	iNeedAccurateClockData(false),
     iFrameNext(NULL),
     iFrameCurrent(NULL),
     iFramePrevious(NULL),
@@ -78,9 +79,13 @@ int MDM166AA::Open()
 		SetNonBlocking(1);
 		//
 		SendCommandReset();
-		//
-		ShowClock();
-
+		
+		//We will need accurate clock data
+		iNeedAccurateClockData=true;
+		//Until we get it just use rough time instead
+		//We don't set clock data here as it turns on clock display too and cause an unpleasant clock flash
+		//Only side effect from not doing this here is that for at most one minute the first time you cold boot your display the time should be wrong.
+		//SetClockData();
 		}
 	return success;
 	}
@@ -114,22 +119,6 @@ void MDM166AA::SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel)
         //TODO
         }
 	}
-
-/**
-*/
-/*
-void MDM166AA::BitBlit(const BitArray& aBitmap, int aSrcWidth, int aSrcHeight, int aTargetX, int aTargetY) const
-	{
-	//TODO: amend loop values so that we don't keep on looping past our frame buffer dimensions.
-	for (int i=0;i<aSrcWidth;i++)
-		{
-		for (int j=0;j<aSrcHeight;j++)
-			{
-            iFrameNext->SetBitValue((aTargetX+i)*HeightInPixels()+aTargetY+j,aBitmap[+i*aSrcHeight+j]);
-			}
-		}
-	}
-*/
 
 /**
 Clear our client side back buffer.
@@ -197,11 +186,41 @@ void MDM166AA::SendCommandClear()
 	}
 
 /**
+Check if accurate clock data is needed and update display clock if system clock seconds are zero.
+This is intended to be called every frame from our SwapBuffers function.
+*/
+void MDM166AA::AttemptClockSynchronization()
+	{
+	//Check if accurate clock data is needed
+	if (!iNeedAccurateClockData)
+		{
+		return;
+		}
+
+	//Fetch local time
+	time_t rawtime;
+	struct tm * timeinfo;
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	//If our seconds are zero we synchronize our display clock
+	if (timeinfo->tm_sec==0)
+		{
+		SendCommandSetClockData(timeinfo->tm_hour,timeinfo->tm_min);
+		//Our clock is as accurate as it can for the time being
+		iNeedAccurateClockData=false;
+		}
+	}
+
+/**
 Put our off screen buffer on screen.
 On screen buffer goes off screen.
 */
 void MDM166AA::SwapBuffers()
 	{
+	//We need to synchronize our clock seconds
+	AttemptClockSynchronization();
+
 	//Only perform buffer swapping if off screen mode is enabled
 	if (OffScreenMode())
 		{
@@ -344,7 +363,11 @@ void MDM166AA::SetBrightness(int aBrightness)
 */
 void MDM166AA::ShowClock()
 	{
-	SetClockData();
+	//Assuming display clock is at least roughly set since we do it when opening our display connection.
+	//We will need accurate clock data next we get a chance.
+	//This should guarantee that if our display remain open for weeks our clock will be synchronized whenever we switch back from clock mode to render mode.
+	iNeedAccurateClockData=true;
+	//Show clock using specified styles
 	SendCommandClockDisplay(EClockLarge,EClock24);
 	}
 
@@ -384,7 +407,13 @@ void MDM166AA::SendCommandSetClockData(unsigned char aHour, unsigned char aMinut
 
 /**
 Set display clock data according to local system time.
-This needs to be redone whenever we open or turn on our display.
+This will only provide 30s accuracy.
+In fact display clock seconds are set to zero whenever clock data is set.
+So you would only get second accuracy if this function was called when system time is at zero second.
+It's the responsibility of AttemptClockSynchronization function to obtain second accuracy.
+The present function is intended to provide only rough clock synchronization.
+
+@note Unfortunately this command also turns on clock display.
 */
 void MDM166AA::SetClockData()
 	{
