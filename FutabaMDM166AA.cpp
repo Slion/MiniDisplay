@@ -9,6 +9,55 @@
 
 
 
+typedef void (MDM166AA::*TSetIconStatus) (int aIndex, int aStatus);
+
+const TSetIconStatus KFunctionPerIcon[]=
+	{
+	&MDM166AA::SetIconNetwork,	//EMiniDisplayIconNetwork,
+    &MDM166AA::SetIconEmail,	//EMiniDisplayIconEmail,
+    &MDM166AA::SetIconMute,	//EMiniDisplayIconMute,
+    &MDM166AA::SetIconVolume, //EMiniDisplayIconVolume,
+	&MDM166AA::SetIconVolumeLabel,	//EMiniDisplayIconVolumeLabel,
+	&MDM166AA::SetIconPlay,	//EMiniDisplayIconPlay,
+	&MDM166AA::SetIconPause,	//EMiniDisplayIconPause,
+	&MDM166AA::SetIconRecording	//EMiniDisplayIconRecording
+	};
+
+const int KMaxIconType = sizeof(KFunctionPerIcon)/sizeof(TSetIconStatus);
+
+/**
+Define how segments each of our icons have.
+Order matters.
+*/
+const int KSegmentsPerIcon[]=
+	{
+	4,	//EMiniDisplayIconNetwork,
+    2,	//EMiniDisplayIconEmail,
+    1,	//EMiniDisplayIconMute,
+    14, //EMiniDisplayIconVolume,
+	1,	//EMiniDisplayIconVolumeLabel,
+	1,	//EMiniDisplayIconPlay,
+	1,	//EMiniDisplayIconPause,
+	1	//EMiniDisplayIconRecording
+	};
+
+/**
+Define how status each of our icon can assume.
+Its typically two for On and Off status.
+*/
+const int KStatusPerIcon[]=
+	{
+	2,	//EMiniDisplayIconNetwork,
+    2,	//EMiniDisplayIconEmail,
+    2,	//EMiniDisplayIconMute,
+    3, //EMiniDisplayIconVolume,
+	2,	//EMiniDisplayIconVolumeLabel,	2,	//EMiniDisplayIconPlay,
+	2,	//EMiniDisplayIconPause,
+	2	//EMiniDisplayIconRecording
+	};
+
+
+
 static void sleep(unsigned int mseconds)
 	{
     clock_t goal = mseconds + clock();
@@ -387,12 +436,34 @@ void MDM166AA::HideClock()
 	Clear();
 	}
 
+/**
+*/
+int MDM166AA::IconCount(TMiniDisplayIconType aIcon)
+	{
+	return KSegmentsPerIcon[aIcon];
+	}
+
+int MDM166AA::IconStatusCount(TMiniDisplayIconType aIcon)
+	{
+	return KStatusPerIcon[aIcon];
+	}
+
+void MDM166AA::SetIconStatus(TMiniDisplayIconType aIcon, int aIndex, int aStatus)
+	{
+	if (aIcon<0||aIcon>=KMaxIconType||(KFunctionPerIcon[aIcon]==NULL))
+		{
+		//Out of range or no function pointer for that icon
+		return;
+		}
+
+	(this->*KFunctionPerIcon[aIcon])(aIndex,aStatus);
+	}
 
 /**
 */
 void MDM166AA::SetIconNetwork(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconNetworkCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconNetwork])
 		{
 		//Out of range
 		return;
@@ -405,7 +476,7 @@ void MDM166AA::SetIconNetwork(int aIndex, int aStatus)
 */
 void MDM166AA::SetIconEmail(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconEmailCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconEmail])
 		{
 		//Out of range
 		return;
@@ -418,7 +489,7 @@ void MDM166AA::SetIconEmail(int aIndex, int aStatus)
 */
 void MDM166AA::SetIconMute(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconMuteCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconMute])
 		{
 		//Out of range
 		return;
@@ -431,17 +502,20 @@ void MDM166AA::SetIconMute(int aIndex, int aStatus)
 */
 void MDM166AA::SetIconVolume(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconVolumeCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconVolume])
 		{
 		//Out of range
 		return;
 		}
 
-	if (aStatus<EIconOff||aStatus>EIconOn)
+	if (aStatus<EIconOff)
 		{
-		//Out of range
-		return;
+		//Assuming we just want to turn it off then
+		aStatus=EIconOff;
 		}
+
+	//Make sure we cap at our highest status value
+	aStatus = MIN(EIconOn,aStatus);
 
 	SendCommandSymbolControl((TIconId)(aIndex+EIconVolumeLevel01),(TIconStatus)aStatus);
 	}
@@ -449,9 +523,23 @@ void MDM166AA::SetIconVolume(int aIndex, int aStatus)
 
 /**
 */
+void MDM166AA::SetIconVolumeLabel(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconMute])
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconVolumeLabel),(aStatus==0?EIconOff:EIconOn));
+	}
+
+
+/**
+*/
 void MDM166AA::SetIconPlay(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconPlayCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconPlay])
 		{
 		//Out of range
 		return;
@@ -465,7 +553,7 @@ void MDM166AA::SetIconPlay(int aIndex, int aStatus)
 */
 void MDM166AA::SetIconPause(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconPauseCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconPause])
 		{
 		//Out of range
 		return;
@@ -479,7 +567,7 @@ void MDM166AA::SetIconPause(int aIndex, int aStatus)
 */
 void MDM166AA::SetIconRecording(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=IconRecordingCount())
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconRecording])
 		{
 		//Out of range
 		return;

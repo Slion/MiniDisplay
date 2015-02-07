@@ -37,12 +37,29 @@ TMiniDisplayType;
 
 typedef enum
     {
-    EMiniDisplayRequestNone,
+    EMiniDisplayRequestNone=0,
     EMiniDisplayRequestDeviceId,
     EMiniDisplayRequestFirmwareRevision,
     EMiniDisplayRequestPowerSupplyStatus
     }
 TMiniDisplayRequest;
+
+/**
+Define the various type of icons we support.
+For binary compatibility new entries must be added at the end.
+*/
+typedef enum
+    {
+    EMiniDisplayIconNetwork=0,
+    EMiniDisplayIconEmail,
+    EMiniDisplayIconMute,
+    EMiniDisplayIconVolume,
+	EMiniDisplayIconVolumeLabel,
+	EMiniDisplayIconPlay,
+	EMiniDisplayIconPause,
+	EMiniDisplayIconRecording
+    }
+TMiniDisplayIconType;
 
 /**
 Attempt to establish a connection to with a display of the given type.
@@ -252,22 +269,33 @@ Specifies whether or not this display supports clock functions.
 */
 extern "C" MDAPI bool MiniDisplaySupportClock(MiniDisplayDevice aDevice);
 
+/**
+Tells how many icons of the given are supported by the specified device.
+Typically icons on a VFD hardware have several segments that can be light up separately.
+@param [IN] The device to apply this command to.
+@param [IN] The type of icon we are interested in.
+@return The number of icons of this kind this display supports.
+*/
+extern "C" MDAPI int MiniDisplayIconCount(MiniDisplayDevice aDevice, TMiniDisplayIconType aIcon);
 
-extern "C" MDAPI int MiniDisplayIconNetworkCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconEmailCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconMuteCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconVolumeCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconPlayCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconPauseCount(MiniDisplayDevice aDevice);
-extern "C" MDAPI int MiniDisplayIconRecordingCount(MiniDisplayDevice aDevice);
-//
-extern "C" MDAPI void MiniDisplaySetIconNetwork(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconEmail(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconMute(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconVolume(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconPlay(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconPause(MiniDisplayDevice aDevice, int aIndex, int aStatus);
-extern "C" MDAPI void MiniDisplaySetIconRecording(MiniDisplayDevice aDevice, int aIndex, int aStatus);
+/**
+Tells how many status the icon of the specified type supports for the given device.
+Status are typically brightness level on VFD hardware.
+Most icon will just support 2 status: 0 for Off and 1 for On.
+@param [IN] The device to apply this command to.
+@param [IN] The type of icon we are interested in.
+@return The number of icons of this kind this display supports.
+*/
+extern "C" MDAPI int MiniDisplayIconStatusCount(MiniDisplayDevice aDevice, TMiniDisplayIconType aIcon);
+
+/**
+Set the status of the given icon for the specified device.
+@param [IN] The device to apply this command to.
+@param [IN] The type of icon we are interested in.
+@param [IN] The index of the icon of the given type.
+@param [IN] The status the icon is to assume.
+*/
+extern "C" MDAPI void MiniDisplaySetIconStatus(MiniDisplayDevice aDevice, TMiniDisplayIconType aIcon, int aIndex, int aStatus);
 
 
 #endif
