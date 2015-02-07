@@ -5,7 +5,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-
+#include "MiniDisplay.h"
 #include "HidDevice.h"
 const int KMaxDisplayStringLength = 256;
 
@@ -57,21 +57,9 @@ public:
 
 	//Icon management
 	//Icon support queries return the number of segments an icon supports.
-	virtual int IconNetworkCount(){return 0;}
-	virtual int IconEmailCount(){return 0;}
-	virtual int IconMuteCount(){return 0;}
-	virtual int IconVolumeCount(){return 0;}
-	virtual int IconPlayCount(){return 0;}
-	virtual int IconPauseCount(){return 0;}
-	virtual int IconRecordingCount(){return 0;}
-	//
-	virtual void SetIconNetwork(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconEmail(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconMute(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconVolume(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconPlay(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconPause(int /*aIndex*/, int /*aStatus*/){}
-	virtual void SetIconRecording(int /*aIndex*/, int /*aStatus*/){}
+	virtual int IconCount(TMiniDisplayIconType /*aIcon*/){return 0;}
+	virtual int IconStatusCount(TMiniDisplayIconType /*aIcon*/){return 0;}
+	virtual void SetIconStatus(TMiniDisplayIconType /*aIcon*/, int /*aIndex*/, int /*aStatus*/){}
 
 protected:
 	void SetRequest(TMiniDisplayRequest aRequest) { iRequest=aRequest; }

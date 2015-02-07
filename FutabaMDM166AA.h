@@ -36,21 +36,9 @@ public:
 	virtual void HideClock();
 	virtual bool SupportClock(){return true;}
 		//Icons
-	virtual int IconNetworkCount(){return 4;}
-	virtual int IconEmailCount(){return 2;}
-	virtual int IconMuteCount(){return 1;}
-	virtual int IconVolumeCount(){return 14;} //TODO: What do we do with "VOL."
-	virtual int IconPlayCount(){return 1;}
-	virtual int IconPauseCount(){return 1;}
-	virtual int IconRecordingCount(){return 1;}
-	//
-	virtual void SetIconNetwork(int aIndex, int aStatus);
-	virtual void SetIconEmail(int aIndex, int aStatus);
-	virtual void SetIconMute(int aIndex, int aStatus);
-	virtual void SetIconVolume(int aIndex, int aStatus);
-	virtual void SetIconPlay(int aIndex, int aStatus);
-	virtual void SetIconPause(int aIndex, int aStatus);
-	virtual void SetIconRecording(int aIndex, int aStatus);
+	virtual int IconCount(TMiniDisplayIconType aIcon);
+	virtual int IconStatusCount(TMiniDisplayIconType aIcon);
+	virtual void SetIconStatus(TMiniDisplayIconType aIcon, int aIndex, int aStatus);
 
 	//From GraphicDisplay
     virtual int WidthInPixels() const {return KMDM166AAWidthInPixels;}
@@ -67,6 +55,17 @@ public:
 	void ToggleOffScreenMode();
     void SetOffScreenMode(bool aOn);
     bool OffScreenMode() const {return iOffScreenMode;}
+
+		//Icon specific
+	void SetIconNetwork(int aIndex, int aStatus);
+	void SetIconEmail(int aIndex, int aStatus);
+	void SetIconMute(int aIndex, int aStatus);
+	void SetIconVolumeLabel(int aIndex, int aStatus);
+	void SetIconVolume(int aIndex, int aStatus);
+	void SetIconPlay(int aIndex, int aStatus);
+	void SetIconPause(int aIndex, int aStatus);
+	void SetIconRecording(int aIndex, int aStatus);
+
 
 private:
 
