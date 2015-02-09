@@ -50,7 +50,8 @@ For binary compatibility new entries must be added at the end.
 */
 typedef enum
     {
-    EMiniDisplayIconNetwork=0,
+    EMiniDisplayIconNetworkSignal=0,
+	EMiniDisplayIconInternet,
     EMiniDisplayIconEmail,
     EMiniDisplayIconMute,
     EMiniDisplayIconVolume,
