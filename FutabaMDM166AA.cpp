@@ -13,8 +13,9 @@ typedef void (MDM166AA::*TSetIconStatus) (int aIndex, int aStatus);
 
 const TSetIconStatus KFunctionPerIcon[]=
 	{
-	&MDM166AA::SetIconNetwork,	//EMiniDisplayIconNetwork,
-    &MDM166AA::SetIconEmail,	//EMiniDisplayIconEmail,
+	&MDM166AA::SetIconNetworkSignal,	//EMiniDisplayIconNetworkSignal,
+    &MDM166AA::SetIconInternet,			//EMiniDisplayInternet,
+	&MDM166AA::SetIconEmail,	//EMiniDisplayIconEmail,
     &MDM166AA::SetIconMute,	//EMiniDisplayIconMute,
     &MDM166AA::SetIconVolume, //EMiniDisplayIconVolume,
 	&MDM166AA::SetIconVolumeLabel,	//EMiniDisplayIconVolumeLabel,
@@ -31,7 +32,8 @@ Order matters.
 */
 const int KSegmentsPerIcon[]=
 	{
-	4,	//EMiniDisplayIconNetwork,
+	3,	//EMiniDisplayIconNetworkSignal,
+	1,	//EMiniDisplayIconInternet,
     2,	//EMiniDisplayIconEmail,
     1,	//EMiniDisplayIconMute,
     14, //EMiniDisplayIconVolume,
@@ -47,11 +49,13 @@ Its typically two for On and Off status.
 */
 const int KStatusPerIcon[]=
 	{
-	2,	//EMiniDisplayIconNetwork,
+	2,	//EMiniDisplayIconNetworkSignal,
+	2,	//EMiniDisplayIconInternet,
     2,	//EMiniDisplayIconEmail,
     2,	//EMiniDisplayIconMute,
-    3, //EMiniDisplayIconVolume,
-	2,	//EMiniDisplayIconVolumeLabel,	2,	//EMiniDisplayIconPlay,
+    3,  //EMiniDisplayIconVolume,
+	2,	//EMiniDisplayIconVolumeLabel,
+	2,	//EMiniDisplayIconPlay,
 	2,	//EMiniDisplayIconPause,
 	2	//EMiniDisplayIconRecording
 	};
@@ -461,9 +465,22 @@ void MDM166AA::SetIconStatus(TMiniDisplayIconType aIcon, int aIndex, int aStatus
 
 /**
 */
-void MDM166AA::SetIconNetwork(int aIndex, int aStatus)
+void MDM166AA::SetIconNetworkSignal(int aIndex, int aStatus)
 	{
-	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconNetwork])
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconNetworkSignal])
+		{
+		//Out of range
+		return;
+		}
+
+	SendCommandSymbolControl((TIconId)(aIndex+EIconNetworkSignalLow),(aStatus==0?EIconOff:EIconOn));
+	}
+
+/**
+*/
+void MDM166AA::SetIconInternet(int aIndex, int aStatus)
+	{
+	if (aIndex<0||aIndex>=KSegmentsPerIcon[EMiniDisplayIconInternet])
 		{
 		//Out of range
 		return;

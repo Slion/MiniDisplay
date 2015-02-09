@@ -57,7 +57,8 @@ public:
     bool OffScreenMode() const {return iOffScreenMode;}
 
 		//Icon specific
-	void SetIconNetwork(int aIndex, int aStatus);
+	void SetIconNetworkSignal(int aIndex, int aStatus);
+	void SetIconInternet(int aIndex, int aStatus);
 	void SetIconEmail(int aIndex, int aStatus);
 	void SetIconMute(int aIndex, int aStatus);
 	void SetIconVolumeLabel(int aIndex, int aStatus);
