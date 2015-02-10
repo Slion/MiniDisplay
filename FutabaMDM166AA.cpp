@@ -134,11 +134,12 @@ int MDM166AA::Open()
 		SendCommandReset();
 		
 		//We will need accurate clock data
-		iNeedAccurateClockData=true;
+		//iNeedAccurateClockData=true;
 		//Until we get it just use rough time instead
-		//We don't set clock data here as it turns on clock display too and cause an unpleasant clock flash
-		//Only side effect from not doing this here is that for at most one minute the first time you cold boot your display the time should be wrong.
-		//SetClockData();
+		//This is needed otherwise the clock won't work for the first minute.
+		//It flashes the clock when opening the display but that's no big deal.
+		ShowClock();
+		SetClockData();
 
 		//Turns mast ON
 		//SetIconNetwork(0,EIconOn);
@@ -188,7 +189,7 @@ void MDM166AA::Clear()
     {
 	//That one also clear the symbols
     SetAllPixels(0x00);
-	SendCommandClear(); //Clear icons too
+	//SendCommandClear(); //Clear icons too
     }
 
 /**
@@ -436,8 +437,8 @@ void MDM166AA::ShowClock()
 */
 void MDM166AA::HideClock()
 	{
-	//TODO: or reset
-	Clear();
+	SetAllPixels(0x00);
+	SwapBuffers();
 	}
 
 /**
@@ -710,6 +711,8 @@ Display RAM filled with 00H.
 Address Counter is set by 00H.
 Dimming is set to 50%.
 Turn off all icons segments.
+
+This does not reset our clock settings.
 */
 void MDM166AA::SendCommandReset()
 	{
