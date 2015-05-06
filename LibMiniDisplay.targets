@@ -1,0 +1,33 @@
+<!--
+***********************************************************************************************
+LibMiniDisplay.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (c) Stephane Lenclud. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LibMiniDisplayDllPath Condition=" '$(LibMiniDisplayPath)' == '' ">$(MSBuildThisFileDirectory)..\native\$(Platform)\MiniDisplay.dll</LibMiniDisplayDllPath>
+  </PropertyGroup>  
+
+  <Target Name="CopyLibMiniDisplayNativeReference">
+    <!-- Make sure the platform has been set appropriately before trying to copy the native reference. -->
+    <Error Code="LH0001" Text="The project platform must be set to x86 or x64. Please change your target platform and try again." Condition=" !Exists('$(LibMiniDisplayDllPath)') " 
+           File="$(MSBuildProjectFile)"/>
+    
+    <Copy SourceFiles="$(LibMiniDisplayDllPath)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
+  </Target>
+
+  <PropertyGroup>
+    <AfterBuildDependsOn>
+      CopyLibMiniDisplayNativeReference;
+    </AfterBuildDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="AfterBuild" DependsOnTargets="$(AfterBuildDependsOn)"/>
+</Project>

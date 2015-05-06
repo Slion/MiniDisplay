@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>LibMiniDisplay</id>
+        <version>1.1.3</version>
+        <title>Mini Display Library</title>
+        <authors>Stéphane Lenclud</authors>
+        <licenseUrl>https://www.gnu.org/copyleft/gpl.html</licenseUrl>
+        <projectUrl>http://hg.slions.net/MiniDisplay</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provide a C interface to drive some Futaba VFD displays.</description>
+        <summary>Currently only supports HID USB conections.</summary>
+        <copyright>Stéphane Lenclud</copyright>
+        <tags>VFD LCD display module Futaba</tags>
+    </metadata>
+    <files>
+        <file src="LibMiniDisplay.targets" target="build\LibMiniDisplay.targets" />
+        <file src="MiniDisplay.h" target="content\MiniDisplay.h" />
+        <file src="Interop\bin\Release\MiniDisplayInterop.dll" target="lib\MiniDisplayInterop.dll" />
+        <file src="..\bin\MiniDisplay\Release\MiniDisplay.dll" target="native\x86\MiniDisplay.dll" />
+    </files>
+</package>
