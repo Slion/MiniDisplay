@@ -1,33 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!--
-***********************************************************************************************
-LibMiniDisplay.targets
+ Copyright (C) 2015 Stephane Lenclud.
 
-WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
-          created a backup copy.  Incorrect changes to this file will make it
-          impossible to load or build your projects from the command-line or the IDE.
+ This file is part of MiniDisplay.
 
-Copyright (c) Stephane Lenclud. All rights reserved.
-***********************************************************************************************
+ MiniDisplay is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ MiniDisplay is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with MiniDisplay.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <LibMiniDisplayDllPath Condition=" '$(LibMiniDisplayPath)' == '' ">$(MSBuildThisFileDirectory)..\native\$(Platform)\MiniDisplay.dll</LibMiniDisplayDllPath>
-  </PropertyGroup>  
-
-  <Target Name="CopyLibMiniDisplayNativeReference">
-    <!-- Make sure the platform has been set appropriately before trying to copy the native reference. -->
-    <Error Code="LH0001" Text="The project platform must be set to x86 or x64. Please change your target platform and try again." Condition=" !Exists('$(LibMiniDisplayDllPath)') " 
-           File="$(MSBuildProjectFile)"/>
-    
-    <Copy SourceFiles="$(LibMiniDisplayDllPath)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
-  </Target>
-
-  <PropertyGroup>
-    <AfterBuildDependsOn>
-      CopyLibMiniDisplayNativeReference;
-    </AfterBuildDependsOn>
-  </PropertyGroup>
-  
-  <Target Name="AfterBuild" DependsOnTargets="$(AfterBuildDependsOn)"/>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)\..\native\x86\MiniDisplay.dll">
+            <Link>MiniDisplay.dll</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 </Project>
