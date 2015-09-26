@@ -20,10 +20,19 @@
 -->
 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <ItemGroup>
+    
+	<!-- That works sometimes -->
+	<ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)\..\native\x86\MiniDisplay.dll">
             <Link>MiniDisplay.dll</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+	
+	<!-- That works the rest of the time. Just don't ask! -->
+	<Target Name="BeforeBuild">
+    	<Copy SourceFiles="$(MSBuildThisFileDirectory)\..\native\x86\MiniDisplay.dll" 
+		DestinationFiles="$(OutputPath)\MiniDisplay.dll" />
+    </Target>
+	
 </Project>
