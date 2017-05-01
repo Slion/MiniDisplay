@@ -37,7 +37,7 @@ set(SOURCES		BitArray.cpp
 				FutabaMDM166AA.cpp
 				HidDevice.cpp
 				MiniDisplay.cpp
-				../../GitHub/hidapi/windows/hid.c)
+				../../hidapi/windows/hid.c)
 
 source_group(Souces FILES ${SOURCES})
 
@@ -55,7 +55,7 @@ set(INCLUDES	BitArray.h
 
 source_group(Includes FILES ${INCLUDES})
 
-include_directories(../../GitHub/hidapi/hidapi)
+include_directories(../../hidapi/hidapi)
 
 # Create a target for the library
 add_library(MiniDisplay ${LIB_TYPE} ${SOURCES} ${INCLUDES})

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>LibMiniDisplay</id>
-        <version>1.1.8</version>
+        <version>1.1.9</version>
         <title>Mini Display Library</title>
         <authors>Stéphane Lenclud</authors>
         <licenseUrl>https://www.gnu.org/copyleft/gpl.html</licenseUrl>
@@ -10,7 +10,10 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Provide a C interface to drive some Futaba VFD displays.</description>
         <summary>Currently only supports HID USB conections.</summary>
-        <releaseNotes>v1.1.8
+        <releaseNotes>v1.1.9
+Target .NET 4.0 and switch to Visual Studio 2015
+
+v1.1.8
 Consolidating target file.</releaseNotes>
         <copyright>Stéphane Lenclud</copyright>
         <tags>VFD LCD display module Futaba</tags>
@@ -18,7 +21,7 @@ Consolidating target file.</releaseNotes>
     <files>
         <file src="LibMiniDisplay.targets" target="build\LibMiniDisplay.targets" />
         <file src="MiniDisplay.h" target="content\MiniDisplay.h" />
-        <file src="Interop\bin\Release\MiniDisplayInterop.dll" target="lib\net20\MiniDisplayInterop.dll" />
+        <file src="Interop\bin\Release\MiniDisplayInterop.dll" target="lib\net40\MiniDisplayInterop.dll" />
         <file src="..\bin\MiniDisplay\Release\MiniDisplay.dll" target="native\x86\MiniDisplay.dll" />
     </files>
 </package>
