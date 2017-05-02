@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>SharpLibMiniDisplay</id>
+        <version>0.0.2</version>
+        <title>Mini Display Library</title>
+        <authors>Stéphane Lenclud</authors>
+        <licenseUrl>https://www.gnu.org/copyleft/gpl.html</licenseUrl>
+        <projectUrl>http://hg.slions.net/MiniDisplay</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provide a .NET interface to drive some Futaba VFD displays.</description>
+        <summary>Currently only supports HID USB conections.</summary>
+        <releaseNotes>v0.0.2
+Fixing DLL path.
+v0.0.1
+Alpha Release.</releaseNotes>
+        <copyright>Stéphane Lenclud</copyright>
+        <tags>VFD LCD display module Futaba</tags>
+    </metadata>
+    <files>
+        <file src="..\Project\Release\SharpLibMiniDisplay.dll" target="lib\net40\SharpLibMiniDisplay.dll" />
+    </files>
+</package>

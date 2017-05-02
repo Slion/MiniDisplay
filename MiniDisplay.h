@@ -32,7 +32,7 @@ building a DLL on windows.
   #if defined(MiniDisplay_EXPORTS)
     #define  MDAPI __declspec(dllexport)
   #else
-    #define  MDAPI __declspec(dllimport)
+    #define  MDAPI
   #endif /* MyLibrary_EXPORTS */
 #else /* defined (_WIN32) */
  #define MDAPI
