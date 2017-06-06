@@ -46,6 +46,9 @@ public:
     virtual int HeightInPixels() const { return KHeightInPixels; }
     virtual int FrameBufferSizeInBytes() const { return KFrameBufferSizeInBytes; }
 
+private:
+    void CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue);
+
 public:
     static const int KWidthInPixels = 256;
     static const int KHeightInPixels = 64;

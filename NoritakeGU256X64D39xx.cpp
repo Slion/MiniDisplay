@@ -78,86 +78,55 @@ void GU256X64D39XX::SetBrightness(int aBrightness)
 
 void GU256X64D39XX::Clear()
 {
-    ArduinoReport report; // TODO: massive object on the stack?
-    report[0] = 0; //Report ID
-    report[1] = 0x02; // STX header
-    report[2] = 0x44; // Header 2
-    report[3] = 0xFF; // Display address: broadcast
-    report[4] = 0x46; // Command: Bit image write
-    report[5] = 0x00; // Write address lower byte
-    report[6] = 0x00; // Write address higher byte
-    report[7] = 0x00; // Data size lower byte
-    report[8] = 0x08; // Data size higher byte
-
-    int aValue = 0x00;
-    int aSize = 2048;
-    int sizeWritten = MIN(aSize, report.Size() - 9);
-    memset(report.Buffer() + 9, aValue, sizeWritten);
-    Write(report);
-    int remainingSize = aSize;
-    remainingSize -= sizeWritten;
-    // TODO: That's broken, fix it
-    //We need to keep on sending our pixel data until we are done
-    while (remainingSize>0)
-    {
-        report.Reset();
-        report[0] = 0x00; //Report ID
-        sizeWritten = 64;
-        memset(report.Buffer() + 1, aValue, sizeWritten);
-        int written = Write(report);
-        while (written < 64)
-        {
-            written = Write(report);
-        }
-        remainingSize -= sizeWritten;
-    }
+    CmdBitImageWrite(0x0000, 0x0800, 0x00);
 }
 
+/*
+*/
 void GU256X64D39XX::Fill()
 {
+    CmdBitImageWrite(0x0000, 0x0800, 0xFF);
+}
+
+/*
+ */
+void GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue)
+{
+    const int KHeaderSize = 10;
+    const int KMaxRetry = 100;
+    int retry = KMaxRetry;
+
     ArduinoReport report; // TODO: massive object on the stack?
-    report[0] = 0; //Report ID
-    report[1] = 0x02; // STX header
-    report[2] = 0x44; // Header 2
-    report[3] = 0xFF; // Display address: broadcast
-    report[4] = 0x46; // Command: Bit image write
-    report[5] = 0x00; // Write address lower byte
-    report[6] = 0x00; // Write address higher byte
-    report[7] = 0x00; // Data size lower byte
-    report[8] = 0x08; // Data size higher byte
+    report[0] = 0x00; //Report ID
+    report[1] = (aSize <= report.Size() - KHeaderSize ? aSize + 8 : 63); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size; // Arduino protocol
+    report[2] = 0x02; // STX header
+    report[3] = 0x44; // Header 2
+    report[4] = 0xFF; // Display address: broadcast
+    report[5] = 0x46; // Command: Bit image write
+    report[6] = (unsigned char)aRamAddress; // Write address lower byte
+    report[7] = aRamAddress>>8; // Write address higher byte
+    report[8] = (unsigned char)aSize; // Data size lower byte
+    report[9] = aSize>>8; // Data size higher byte
+    
 
-    int aValue = 0xFF;
-    int aSize = 2048;
-    int sizeWritten = MIN(aSize, report.Size() - 9);
-    memset(report.Buffer() + 9, aValue, sizeWritten);
-    Write(report);
+    int sizeWritten = MIN(aSize, report.Size() - KHeaderSize);
+    memset(report.Buffer() + KHeaderSize, aValue, sizeWritten);
+    while (Write(report) != report.Size() && retry-->0);
+    retry = KMaxRetry; // Rearm
+
     int remainingSize = aSize;
-    remainingSize -= sizeWritten;
-    // TODO: That's broken, fix it
     //We need to keep on sending our pixel data until we are done
-    while (remainingSize>0)
+    while (report[1] == 63)
     {
-        report.Reset();        
-        report[0] = 0x00; //Report ID
-        sizeWritten = 64;
-        memset(report.Buffer() + 1, aValue, sizeWritten);
-        int written=Write(report);
-        while (written < 64)
-        {
-            written = Write(report);
-        }
+        report.Reset();
         remainingSize -= sizeWritten;
+        report[0] = 0x00; //Report ID
+        report[1] = MIN(remainingSize,63); //Report length, should be 64 or the remaining size
+        sizeWritten = report[1];
+        memset(report.Buffer() + 2, aValue, sizeWritten);
+        while (Write(report) != report.Size() && retry-->0);
+        retry = KMaxRetry; // Rearm
     }
-
-
-    /*
-    int i = 9;
-    while (i < report.Size())
-    {
-        report[i] = 0xFF;
-        i++;
-    }
-    Write(report);*/
 }
 
 void GU256X64D39XX::SwapBuffers()

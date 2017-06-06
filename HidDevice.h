@@ -71,7 +71,7 @@ private:
 template<int S>
 int HidDevice::Write(const HidReport<S>& aOutputReport)
     {
-    return hid_write(iHidDevice,aOutputReport.Buffer(),S);
+    return hid_write(iHidDevice,aOutputReport.Buffer(), aOutputReport.Size());
     }
 
 /**

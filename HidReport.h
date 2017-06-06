@@ -36,14 +36,20 @@ public:
     inline unsigned char& operator[](int aIndex){return iBuffer[aIndex];}
     const unsigned char* Buffer() const {return iBuffer;}
     unsigned char* Buffer() {return iBuffer;}
-    int Size() {return S;}
+    int Size() const {return iSize;}
+    void SetSize(int aSize) { iSize=aSize; }
+    int MaxSize() const {return S;}
 protected:
+    int iSize;
     unsigned char iBuffer[S];
     };
 
 template <int S>
 void HidReport<S>::Reset()
     {
+    // Size should be set to zero I guess
+    // However for backward compatibility we keep it like that for now
+    iSize = MaxSize();
     memset(iBuffer,0,sizeof(iBuffer));
     }
 
