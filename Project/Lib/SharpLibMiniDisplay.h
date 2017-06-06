@@ -41,7 +41,8 @@ namespace SharpLib::MiniDisplay
         AutoDetect = EMiniDisplayAutoDetect,
         FutabaGP1212A01 = EMiniDisplayFutabaGP1212A01,
         FutabaGP1212A02 = EMiniDisplayFutabaGP1212A02,
-        FutabaMDM166AA = EMiniDisplayFutabaMDM166AA
+        FutabaMDM166AA = EMiniDisplayFutabaMDM166AA,
+        NoritakeGU256X64D39XX = EMiniDisplayNoritakeGU256X64D39XX
     };
 
 
@@ -368,4 +369,5 @@ namespace SharpLib::MiniDisplay
             return gcnew String(MiniDisplayFirmwareRevision(iDevice));
         }
     };
+
 }

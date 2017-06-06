@@ -46,6 +46,7 @@ typedef enum
     EMiniDisplayFutabaGP1212A01,
     EMiniDisplayFutabaGP1212A02,
 	EMiniDisplayFutabaMDM166AA,
+    EMiniDisplayNoritakeGU256X64D39XX,
 	EMiniDisplayAutoDetectFailed
     }
 TMiniDisplayType;

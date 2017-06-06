@@ -24,6 +24,15 @@
 #include "HidDevice.h"
 const int KMaxDisplayStringLength = 256;
 
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+
+
 /**
 Define an interface to some basic display functionality
 */

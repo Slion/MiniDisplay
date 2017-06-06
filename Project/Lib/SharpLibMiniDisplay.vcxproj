@@ -138,6 +138,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ArduinoDisplay.h" />
+    <ClInclude Include="..\..\FutabaVfd.h" />
     <ClInclude Include="..\..\MiniDisplay.h" />
     <ClInclude Include="..\..\BitArray.h" />
     <ClInclude Include="..\..\Display.h" />
@@ -147,12 +149,14 @@
     <ClInclude Include="..\..\FutabaMDM166AA.h" />
     <ClInclude Include="..\..\HidDevice.h" />
     <ClInclude Include="..\..\HidReport.h" />
+    <ClInclude Include="..\..\NoritakeGU256X64D39xx.h" />
     <ClInclude Include="hidapi.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SharpLibMiniDisplay.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ArduinoDisplay.cpp" />
     <ClCompile Include="..\..\MiniDisplay.cpp" />
     <ClCompile Include="..\..\BitArray.cpp" />
     <ClCompile Include="..\..\FutabaGP1212.cpp" />
@@ -161,6 +165,7 @@
     <ClCompile Include="..\..\FutabaMDM166AA.cpp" />
     <ClCompile Include="..\..\FutabaVfd.cpp" />
     <ClCompile Include="..\..\HidDevice.cpp" />
+    <ClCompile Include="..\..\NoritakeGU256X64D39xx.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="hid.cpp" />
     <ClCompile Include="SharpLibMiniDisplay.cpp" />

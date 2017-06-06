@@ -25,14 +25,6 @@
 #include "MiniDisplay.h"
 #include "Display.h"
 
-#ifndef MIN
-#define MIN(a,b) (((a)<(b))?(a):(b))
-#endif
-
-#ifndef MAX
-#define MAX(a,b) (((a)>(b))?(a):(b))
-#endif
-
 
 //This was computed from our number of pixels as follow 256x64/8/64 = 32 + 1 = 33
 //+1 was added for our header

@@ -21,6 +21,7 @@
 #include "FutabaGP1212A01.h"
 #include "FutabaGP1212A02.h"
 #include "FutabaMDM166AA.h"
+#include "NoritakeGU256X64D39XX.h"
 
 /**
 Make sure you update this list when adding a new display.
@@ -53,6 +54,11 @@ MiniDisplayDevice MiniDisplayOpen(TMiniDisplayType aType, bool aAutoDetect)
 	case EMiniDisplayFutabaMDM166AA:
 		device=new MDM166AA();
 		break;
+
+    case EMiniDisplayNoritakeGU256X64D39XX:
+        device = new GU256X64D39XX();
+        break;
+
 
 	case EMiniDisplayAutoDetectFailed:
 		//Auto detect sequence failed

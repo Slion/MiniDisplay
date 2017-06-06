@@ -54,6 +54,15 @@
     <ClInclude Include="..\..\HidReport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FutabaVfd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ArduinoDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\NoritakeGU256X64D39xx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SharpLibMiniDisplay.cpp">
@@ -90,6 +99,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\HidDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ArduinoDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\NoritakeGU256X64D39xx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
