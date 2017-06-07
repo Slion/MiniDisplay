@@ -48,24 +48,17 @@ void TReportDataProcessor<unsigned char*&>::Copy(unsigned char* aDestination, un
 }
 
 GU256X64D39XX::GU256X64D39XX() :
-    iFrameNext(NULL),
-    iFrameCurrent(NULL),
-    iFrameAlpha(NULL),
-    iFrameBeta(NULL)
+    iScreenBufferAddress(KFrameRamAddressOne),
+    iOffScreenBufferAddress(KFrameRamAddressTwo),
+    iFrame(NULL)
 {
 
 }
 
 GU256X64D39XX::~GU256X64D39XX()
 {
-    iFrameNext = NULL;
-    iFrameCurrent = NULL;
-    //
-    delete iFrameAlpha;
-    iFrameAlpha = NULL;
-    //
-    delete iFrameBeta;
-    iFrameBeta = NULL;
+    delete iFrame;
+    iFrame = NULL;
 }
 
 /**
@@ -75,17 +68,12 @@ int GU256X64D39XX::Open()
     int success = HidDevice::Open(KArduinoVendorId, KArduinoMicroProductId, NULL);
     if (success)
     {
-        //Allocate both frames
-        delete iFrameAlpha;
-        iFrameAlpha = NULL;
-        iFrameAlpha = new BitArrayLow(KFrameBufferPixelCount);
-        //
-        delete iFrameBeta;
-        iFrameBeta = NULL;
-        iFrameBeta = new BitArrayLow(KFrameBufferPixelCount);
-        //
-        iFrameNext = iFrameAlpha;
-        iFrameCurrent = iFrameBeta;
+        // Make sure our frame buffer addres is in sync
+        CmdSpecifyDisplayStartAddress(iScreenBufferAddress);
+        //Allocate frame
+        delete iFrame;
+        iFrame = NULL;
+        iFrame = new BitArrayLow(KFrameBufferPixelCount);
 
         //To make sure it is synced properly
         //iNeedFullFrameUpdate = 0;
@@ -106,17 +94,17 @@ void GU256X64D39XX::SetPixel(unsigned char aX, unsigned char aY, unsigned int aP
 
     if (on)
     {
-        iFrameCurrent->SetBit(aX*HeightInPixels() + aY);
+        iFrame->SetBit(aX*HeightInPixels() + aY);
     }
     else
     {
-        iFrameCurrent->ClearBit(aX*HeightInPixels() + aY);
+        iFrame->ClearBit(aX*HeightInPixels() + aY);
     }
 }
 
 void GU256X64D39XX::SetAllPixels(unsigned char aPattern)
 {
-
+    memset(iFrame->Ptr(), aPattern, iFrame->SizeInBytes());
 }
 
 void GU256X64D39XX::SetBrightness(int aBrightness)
@@ -126,14 +114,14 @@ void GU256X64D39XX::SetBrightness(int aBrightness)
 
 void GU256X64D39XX::Clear()
 {
-    iFrameCurrent->ClearAll();
+    iFrame->ClearAll();
 }
 
 /*
 */
 void GU256X64D39XX::Fill()
 {
-    iFrameCurrent->SetAll();
+    iFrame->SetAll();
 }
 
 /**
@@ -177,7 +165,7 @@ int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short a
     while (Write(report) != report.Size() && retry-->0);
     if (retry < 0)
     {
-        // Abort since we can't sent our command header
+        // Abort since we can't send our command header
         return remainingSize;
     }
     retry = KMaxRetry; // Rearm
@@ -212,14 +200,46 @@ int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short a
 
 /*
 */
+int GU256X64D39XX::CmdSpecifyDisplayStartAddress(unsigned short aRamAddress)
+{
+    const int KMaxRetry = 100;
+    int retry = KMaxRetry;
+    ArduinoReport report;
+    report[0] = 0x00; //Report ID
+    report[1] = 0x06; //Report length excluding first two bytes.
+    report[2] = 0x02; // STX header
+    report[3] = 0x44; // Header 2
+    report[4] = 0xFF; // Display address: broadcast
+    report[5] = 0x53; // Command: Specifiy Display Start Address
+    report[6] = (unsigned char)aRamAddress; // Write address lower byte
+    report[7] = aRamAddress >> 8; // Write address higher byte
+    while (Write(report) != report.Size() && retry-->0);
+    if (retry < 0)
+    {
+        // Abort since we can't send our command header
+        return report.Size();
+    }
+    return 0;
+}
+
+/*
+*/
 void GU256X64D39XX::SwapBuffers()
 {
     // Our template needs to pointer reference to be able advance it.
     // Therefore we take a local copy...
-    unsigned char* ptr = iFrameCurrent->Ptr();
+    unsigned char* ptr = iFrame->Ptr();
     // ...and pass its reference to our template function.
     // That requires explicitly specifying the template parameter.
-    CmdBitImageWrite<unsigned char*&>(0x0, iFrameCurrent->SizeInBytes(), ptr);
+    CmdBitImageWrite<unsigned char*&>(iOffScreenBufferAddress, iFrame->SizeInBytes(), ptr);
+    if (!CmdSpecifyDisplayStartAddress(iOffScreenBufferAddress))
+    {
+        // Only register our swap if there was no error
+        unsigned short screenAddress = iOffScreenBufferAddress;
+        iOffScreenBufferAddress = iScreenBufferAddress;
+        iScreenBufferAddress = screenAddress;
+    }
+    iFrame->ClearAll();
 }
 
 

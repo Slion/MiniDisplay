@@ -32,6 +32,7 @@ class HidReport
     {
 public:
     HidReport(){Reset();}
+    virtual ~HidReport() {};
     void Reset();
     inline unsigned char& operator[](int aIndex){return iBuffer[aIndex];}
     const unsigned char* Buffer() const {return iBuffer;}

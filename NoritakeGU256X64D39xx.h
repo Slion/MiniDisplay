@@ -25,7 +25,9 @@
 
 
 /**
-
+ Display driver for Noritake GU256x64D-39XX.
+ Using Noritake Graphic DMA mode. DIP Switch 6 must have been turned ON.
+ Assuming a USB connection over an Adruino Micro loaded with proper firmware.
 */
 class GU256X64D39XX : public ArduinoGraphicDisplay
 {
@@ -52,6 +54,7 @@ public:
 private:
     template<typename T>
     int CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, T aData);
+    int CmdSpecifyDisplayStartAddress(unsigned short aAddress);
 
 public:
     static const int KWidthInPixels = 256;
@@ -59,13 +62,15 @@ public:
     static const int KPixelsPerByte = 8;
     static const int KFrameBufferSizeInBytes = KWidthInPixels*KHeightInPixels / KPixelsPerByte; //256*64/8=2048
     static const int KFrameBufferPixelCount = KWidthInPixels*KHeightInPixels;
+private:
+    static const unsigned short KFrameRamAddressOne = 0x0000;
+    static const unsigned short KFrameRamAddressTwo = 0x0800;
 
-public:
-    BitArrayLow* iFrameCurrent; //Used
-    BitArrayLow* iFrameNext; //Used
+private:
+    unsigned short iScreenBufferAddress;
+    unsigned short iOffScreenBufferAddress;
 
-    BitArrayLow* iFrameAlpha; //Owned
-    BitArrayLow* iFrameBeta; //Owned
+    BitArrayLow* iFrame; //Owned
 };
 
 

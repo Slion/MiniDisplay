@@ -102,7 +102,7 @@ void clearScreen()
 void setup()
 {
   // Open serial port
-  Serial.begin(115200);
+  //Serial.begin(115200);
   // Set the RawHID OUT report array.
   // Feature reports are also (parallel) possible, see the other example for this.
   RawHID.begin(rawhidData, sizeof(rawhidData));

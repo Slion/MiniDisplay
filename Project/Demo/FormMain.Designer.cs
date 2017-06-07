@@ -183,6 +183,7 @@
             // iPictureBoxDisplay
             // 
             this.iPictureBoxDisplay.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.iPictureBoxDisplay.Cursor = System.Windows.Forms.Cursors.Cross;
             this.iPictureBoxDisplay.Location = new System.Drawing.Point(40, 156);
             this.iPictureBoxDisplay.Name = "iPictureBoxDisplay";
             this.iPictureBoxDisplay.Size = new System.Drawing.Size(100, 50);

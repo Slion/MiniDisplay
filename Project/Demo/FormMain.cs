@@ -17,6 +17,7 @@ namespace MiniDisplayDemo
         Display iDisplay;
         DateTime iLastTickTime;
         Bitmap iBitmap;
+        Rectangle iBitmapRect;
 
         public FormMain()
         {
@@ -52,7 +53,17 @@ namespace MiniDisplayDemo
         private void ResetBitmap()
         {
             iBitmap = new System.Drawing.Bitmap(iDisplay.WidthInPixels(), iDisplay.HeightInPixels(), PixelFormat.Format32bppArgb);
+            for (int i = 0; i < iBitmap.Width; i++)
+            {
+                for (int j = 0; j < iBitmap.Height; j++)
+                {
+                    iBitmap.SetPixel(i, j, Color.White);
+                }
+            }
             iPictureBoxDisplay.Image = iBitmap;
+
+            Point pt = new Point(0, 0);
+            iBitmapRect = new Rectangle(pt, iBitmap.Size);
         }
 
         private void TimerStart()
@@ -113,7 +124,34 @@ namespace MiniDisplayDemo
         private void iTimer_Tick(object sender, EventArgs e)
         {
             DateTime newTickTime = DateTime.Now;
+
+            //
+            // Send it to our display
+            // Watch performance of that loop
+            // The empty loop itself takes 4ms in debug
+            unsafe
+            {
+                // Use LockBits for best performance
+                BitmapData bitmap = iBitmap.LockBits(iBitmapRect, ImageLockMode.ReadOnly, iBitmap.PixelFormat);
+                uint* pixels = (uint*)bitmap.Scan0.ToPointer(); // Assuming 4 bytes per pixel since we specified the format ourselves
+                for (int i = 0; i < bitmap.Width; i++)
+                {
+                    for (int j = 0; j < bitmap.Height; j++)
+                    {
+                        //Get pixel color
+                        // We need to reverse our color so as to light up the black pixels
+                        uint color = ~(pixels[j*bitmap.Width+i]);
+
+                        //Now set our pixel
+                        // We spend almost 10ms in there in debug maybe only 2ms in release
+                        iDisplay.SetPixel(i, j, color);
+                    }
+                }
+                iBitmap.UnlockBits(bitmap);
+            }            
+
             iDisplay.SwapBuffers();
+
             DateTime afterRender = DateTime.Now;
             // Compute FPS
             iLabelFps.Text = (1.0 / newTickTime.Subtract(iLastTickTime).TotalSeconds).ToString("F0") + " / " +
@@ -132,13 +170,13 @@ namespace MiniDisplayDemo
         private void iPictureBoxDisplay_MouseMove(object sender, MouseEventArgs e)
         {
             if (iDisplay.IsOpen() && e.Button==MouseButtons.Left 
-                && e.X>0 && e.X<iBitmap.Width
-                && e.Y > 0 && e.Y < iBitmap.Height)
+                && e.X >= 0 && e.X < iBitmap.Width
+                && e.Y >= 0 && e.Y < iBitmap.Height)
             {
                 // Set pixels in both bitmap and screen
                 iBitmap.SetPixel(e.X, e.Y, Color.Black);
                 iPictureBoxDisplay.Image = iBitmap; // Most ineficient I guess
-                iDisplay.SetPixel(e.X, e.Y, 1);
+                //iDisplay.SetPixel(e.X, e.Y, 1);
             }                            
         }
     }
