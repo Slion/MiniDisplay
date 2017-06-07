@@ -14,23 +14,58 @@ namespace MiniDisplayDemo
     public partial class FormMain : Form
     {
         Display iDisplay;
+        DateTime iLastTickTime;
 
         public FormMain()
         {
             InitializeComponent();
 
             iDisplay = new Display();
-            iDisplay.OnOpened += OnDisplayOpened;            
+            iDisplay.OnOpened += OnDisplayOpened;
+            iDisplay.OnClosed += OnDisplayClosed;
+            UpdateControls();
+            iNumericTimerInterval.Value = iTimer.Interval;
         }
 
         public void OnDisplayOpened(Display aDisplay)
         {
+            UpdateControls();
             // Set maximum pixels coordinates
             iNumericX.Maximum = iDisplay.WidthInPixels()-1;
             iNumericY.Maximum = iDisplay.HeightInPixels()-1;
             //
             iDisplay.Clear();
-            iDisplay.SwapBuffers();
+            TimerStart();
+            //iDisplay.SwapBuffers();
+        }
+
+        public void OnDisplayClosed(Display aDisplay)
+        {
+            UpdateControls();
+            TimerStop();
+        }
+
+        private void TimerStart()
+        {
+            iLastTickTime = DateTime.Now; //Reset timer to prevent jump
+            iTimer.Enabled = true;
+            
+        }
+
+        private void TimerStop()
+        {
+            iLastTickTime = DateTime.Now; //Reset timer to prevent jump
+            iTimer.Enabled = false;
+            
+        }
+
+        private void UpdateControls()
+        {
+            iButtonSetPixel.Enabled = iDisplay.IsOpen();
+            iButtonOpen.Enabled = !iDisplay.IsOpen();
+            iButtonClose.Enabled = iDisplay.IsOpen();
+            iButtonClear.Enabled = iDisplay.IsOpen();
+            iButtonFill.Enabled = iDisplay.IsOpen();
         }
 
         private void iButtonOpen_Click(object sender, EventArgs e)
@@ -46,24 +81,40 @@ namespace MiniDisplayDemo
         private void iButtonFill_Click(object sender, EventArgs e)
         {
             iDisplay.Fill();
-            iDisplay.SwapBuffers();
         }
 
         private void iButtonClear_Click(object sender, EventArgs e)
         {
             iDisplay.Clear();
-            iDisplay.SwapBuffers();
         }
 
         private void iButonSetPixel_Click(object sender, EventArgs e)
         {
             iDisplay.SetPixel((int)iNumericX.Value, (int)iNumericY.Value, 1);
-            iDisplay.SwapBuffers();
         }
 
         private void FormMain_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void iTimer_Tick(object sender, EventArgs e)
+        {
+            DateTime newTickTime = DateTime.Now;
+            iDisplay.SwapBuffers();
+            DateTime afterRender = DateTime.Now;
+            // Compute FPS
+            iLabelFps.Text = (1.0 / newTickTime.Subtract(iLastTickTime).TotalSeconds).ToString("F0") + " / " +
+                                           (1000 / iTimer.Interval).ToString() + " FPS - " +
+                                           afterRender.Subtract(newTickTime).TotalMilliseconds + " ms";
+
+
+            iLastTickTime = newTickTime;
+        }
+
+        private void iNumericTimerInterval_ValueChanged(object sender, EventArgs e)
+        {
+            iTimer.Interval = (int)iNumericTimerInterval.Value;
         }
     }
 }

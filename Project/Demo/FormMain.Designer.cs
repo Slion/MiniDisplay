@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.iButtonOpen = new System.Windows.Forms.Button();
             this.iButtonClose = new System.Windows.Forms.Button();
             this.iButtonFill = new System.Windows.Forms.Button();
@@ -37,8 +38,13 @@
             this.iNumericY = new System.Windows.Forms.NumericUpDown();
             this.iLabelX = new System.Windows.Forms.Label();
             this.iLabelY = new System.Windows.Forms.Label();
+            this.iTimer = new System.Windows.Forms.Timer(this.components);
+            this.iNumericTimerInterval = new System.Windows.Forms.NumericUpDown();
+            this.iLabelTimerInterval = new System.Windows.Forms.Label();
+            this.iLabelFps = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericTimerInterval)).BeginInit();
             this.SuspendLayout();
             // 
             // iButtonOpen
@@ -83,7 +89,7 @@
             // 
             // iButtonSetPixel
             // 
-            this.iButtonSetPixel.Location = new System.Drawing.Point(197, 70);
+            this.iButtonSetPixel.Location = new System.Drawing.Point(235, 70);
             this.iButtonSetPixel.Name = "iButtonSetPixel";
             this.iButtonSetPixel.Size = new System.Drawing.Size(75, 23);
             this.iButtonSetPixel.TabIndex = 4;
@@ -93,22 +99,22 @@
             // 
             // iNumericX
             // 
-            this.iNumericX.Location = new System.Drawing.Point(183, 12);
+            this.iNumericX.Location = new System.Drawing.Point(235, 12);
             this.iNumericX.Name = "iNumericX";
-            this.iNumericX.Size = new System.Drawing.Size(89, 20);
+            this.iNumericX.Size = new System.Drawing.Size(75, 20);
             this.iNumericX.TabIndex = 5;
             // 
             // iNumericY
             // 
-            this.iNumericY.Location = new System.Drawing.Point(183, 44);
+            this.iNumericY.Location = new System.Drawing.Point(235, 44);
             this.iNumericY.Name = "iNumericY";
-            this.iNumericY.Size = new System.Drawing.Size(89, 20);
+            this.iNumericY.Size = new System.Drawing.Size(75, 20);
             this.iNumericY.TabIndex = 6;
             // 
             // iLabelX
             // 
             this.iLabelX.AutoSize = true;
-            this.iLabelX.Location = new System.Drawing.Point(160, 14);
+            this.iLabelX.Location = new System.Drawing.Point(212, 14);
             this.iLabelX.Name = "iLabelX";
             this.iLabelX.Size = new System.Drawing.Size(17, 13);
             this.iLabelX.TabIndex = 7;
@@ -117,17 +123,61 @@
             // iLabelY
             // 
             this.iLabelY.AutoSize = true;
-            this.iLabelY.Location = new System.Drawing.Point(160, 46);
+            this.iLabelY.Location = new System.Drawing.Point(212, 46);
             this.iLabelY.Name = "iLabelY";
             this.iLabelY.Size = new System.Drawing.Size(17, 13);
             this.iLabelY.TabIndex = 8;
             this.iLabelY.Text = "Y:";
             // 
+            // iTimer
+            // 
+            this.iTimer.Interval = 15;
+            this.iTimer.Tick += new System.EventHandler(this.iTimer_Tick);
+            // 
+            // iNumericTimerInterval
+            // 
+            this.iNumericTimerInterval.Location = new System.Drawing.Point(235, 102);
+            this.iNumericTimerInterval.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.iNumericTimerInterval.Name = "iNumericTimerInterval";
+            this.iNumericTimerInterval.Size = new System.Drawing.Size(75, 20);
+            this.iNumericTimerInterval.TabIndex = 9;
+            this.iNumericTimerInterval.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.iNumericTimerInterval.ValueChanged += new System.EventHandler(this.iNumericTimerInterval_ValueChanged);
+            // 
+            // iLabelTimerInterval
+            // 
+            this.iLabelTimerInterval.AutoSize = true;
+            this.iLabelTimerInterval.Location = new System.Drawing.Point(131, 104);
+            this.iLabelTimerInterval.Name = "iLabelTimerInterval";
+            this.iLabelTimerInterval.Size = new System.Drawing.Size(98, 13);
+            this.iLabelTimerInterval.TabIndex = 10;
+            this.iLabelTimerInterval.Text = "Timer interval (ms) :";
+            // 
+            // iLabelFps
+            // 
+            this.iLabelFps.AutoSize = true;
+            this.iLabelFps.Location = new System.Drawing.Point(12, 239);
+            this.iLabelFps.Name = "iLabelFps";
+            this.iLabelFps.Size = new System.Drawing.Size(27, 13);
+            this.iLabelFps.TabIndex = 11;
+            this.iLabelFps.Text = "FPS";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(322, 261);
+            this.Controls.Add(this.iLabelFps);
+            this.Controls.Add(this.iLabelTimerInterval);
+            this.Controls.Add(this.iNumericTimerInterval);
             this.Controls.Add(this.iLabelY);
             this.Controls.Add(this.iLabelX);
             this.Controls.Add(this.iNumericY);
@@ -142,6 +192,7 @@
             this.Load += new System.EventHandler(this.FormMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericTimerInterval)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -158,6 +209,10 @@
         private System.Windows.Forms.NumericUpDown iNumericY;
         private System.Windows.Forms.Label iLabelX;
         private System.Windows.Forms.Label iLabelY;
+        private System.Windows.Forms.Timer iTimer;
+        private System.Windows.Forms.NumericUpDown iNumericTimerInterval;
+        private System.Windows.Forms.Label iLabelTimerInterval;
+        private System.Windows.Forms.Label iLabelFps;
     }
 }
 
