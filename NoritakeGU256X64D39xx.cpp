@@ -20,6 +20,30 @@
 
 #include "NoritakeGU256X64D39xx.h"
 
+/**
+Template for report data processor to avoid duplicating our core communication algorithm like we did for the Futaba displays.
+*/
+template <typename T>
+class TReportDataProcessor
+{
+public:
+    void Copy(unsigned char* aDestination, T aData, int aSize);
+};
+
+// Specialization for pattern fill
+template<>
+void TReportDataProcessor<unsigned char>::Copy(unsigned char* aDestination, unsigned char aData, int aSize)
+{
+    memset(aDestination, aData, aSize);
+}
+
+// Specialization for buffer copy
+template<>
+void TReportDataProcessor<unsigned char*>::Copy(unsigned char* aDestination, unsigned char* aData, int aSize)
+{
+    memcpy(aDestination, aData, aSize);
+}
+
 
 /**
 */
@@ -78,14 +102,14 @@ void GU256X64D39XX::SetBrightness(int aBrightness)
 
 void GU256X64D39XX::Clear()
 {
-    CmdBitImageWrite(0x0000, 0x0800, 0x00);
+    CmdBitImageWrite<unsigned char>(0x0000, 0x0800,0x00);
 }
 
 /*
 */
 void GU256X64D39XX::Fill()
 {
-    CmdBitImageWrite(0x0000, 0x0800, 0xFF);
+    CmdBitImageWrite<unsigned char>(0x0000, 0x0800, 0xFF);
 }
 
 /**
@@ -96,9 +120,11 @@ void GU256X64D39XX::Fill()
  * @param aValue Byte value corresponding to 8 pixels on a vertical line.
  * @return Zero on success. Positive number indicate not all data could be sent. Negative number means algorithm issue a too much data was sent.
  */
-int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue)
+template<typename T>
+int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, T aValue)
 {
     ArduinoReport report;
+    TReportDataProcessor<T> processor;
 
     const int KReportCmdHeaderSize = 10;
     const int KArdruinoCmdHeaderSize = 9;
@@ -122,8 +148,8 @@ int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short a
     report[9] = aSize>>8; // Data size higher byte
     
     int remainingSize = aSize;
-    int sizeWritten = MIN(aSize, report.Size() - KReportCmdHeaderSize);
-    memset(report.Buffer() + KReportCmdHeaderSize, aValue, sizeWritten);
+    int sizeWritten = MIN(aSize, report.Size() - KReportCmdHeaderSize);    
+    processor.Copy(report.Buffer() + KReportCmdHeaderSize, aValue, sizeWritten);
     while (Write(report) != report.Size() && retry-->0);
     if (retry < 0)
     {
@@ -139,7 +165,7 @@ int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short a
         report[0] = 0x00; //Report ID
         report[1] = MIN(remainingSize, KMaxDataSizePerReport); //Report length, should be 64 or the remaining size
         sizeWritten = report[1];
-        memset(report.Buffer() + KReportMinHeaderSize, aValue, sizeWritten);
+        processor.Copy(report.Buffer() + KReportMinHeaderSize, aValue, sizeWritten);
         while (Write(report) != report.Size() && retry-->0);
         if (retry < 0)
         {
