@@ -55,6 +55,9 @@ public:
     //From DisplayBase
     virtual void Close();
 
+protected:
+    static const int KReportMinHeaderSize = 2;
+
 };
 
 

@@ -88,17 +88,29 @@ void GU256X64D39XX::Fill()
     CmdBitImageWrite(0x0000, 0x0800, 0xFF);
 }
 
-/*
+/**
+ * Fill in our display memory with the given 8 vertical pixels value from the given RAM address for the given size. 
+ *
+ * @param aRamAddress Display RAM address at which to start copying our pixel data.
+ * @param aSize Size in bytes of our pixel data.
+ * @param aValue Byte value corresponding to 8 pixels on a vertical line.
  */
 void GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue)
 {
-    const int KHeaderSize = 10;
+    ArduinoReport report;
+
+    const int KReportCmdHeaderSize = 10;
+    const int KArdruinoCmdHeaderSize = 9;
+    const int KNoritakeCmdHeaderSize = 8;
+    const int KMaxDataSizePerReport = report.MaxSize() - KReportMinHeaderSize;
+    const int KMinDataSizePerReport = report.MaxSize() - KReportCmdHeaderSize;
+
     const int KMaxRetry = 100;
     int retry = KMaxRetry;
 
-    ArduinoReport report; // TODO: massive object on the stack?
+    
     report[0] = 0x00; //Report ID
-    report[1] = (aSize <= report.Size() - KHeaderSize ? aSize + 8 : 63); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size; // Arduino protocol
+    report[1] = (aSize <= KMinDataSizePerReport ? aSize + KNoritakeCmdHeaderSize : KMaxDataSizePerReport); //Report length. -10 is for our header first 10 bytes. +8 is for our Futaba header size; // Arduino protocol
     report[2] = 0x02; // STX header
     report[3] = 0x44; // Header 2
     report[4] = 0xFF; // Display address: broadcast
@@ -108,22 +120,26 @@ void GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short 
     report[8] = (unsigned char)aSize; // Data size lower byte
     report[9] = aSize>>8; // Data size higher byte
     
-
-    int sizeWritten = MIN(aSize, report.Size() - KHeaderSize);
-    memset(report.Buffer() + KHeaderSize, aValue, sizeWritten);
+    int sizeWritten = MIN(aSize, report.Size() - KReportCmdHeaderSize);
+    memset(report.Buffer() + KReportCmdHeaderSize, aValue, sizeWritten);
     while (Write(report) != report.Size() && retry-->0);
+    if (retry < 0)
+    {
+        // Abort since we can't sent our command header
+        return;
+    }
     retry = KMaxRetry; // Rearm
 
-    int remainingSize = aSize;
+    int remainingSize = aSize; // -sizeWritten;
     //We need to keep on sending our pixel data until we are done
-    while (report[1] == 63)
+    while (report[1] == KMaxDataSizePerReport)
     {
         report.Reset();
         remainingSize -= sizeWritten;
         report[0] = 0x00; //Report ID
-        report[1] = MIN(remainingSize,63); //Report length, should be 64 or the remaining size
+        report[1] = MIN(remainingSize, KMaxDataSizePerReport); //Report length, should be 64 or the remaining size
         sizeWritten = report[1];
-        memset(report.Buffer() + 2, aValue, sizeWritten);
+        memset(report.Buffer() + KReportMinHeaderSize, aValue, sizeWritten);
         while (Write(report) != report.Size() && retry-->0);
         retry = KMaxRetry; // Rearm
     }
