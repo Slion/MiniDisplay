@@ -25,9 +25,12 @@ namespace MiniDisplayDemo
 
         public void OnDisplayOpened(Display aDisplay)
         {
-            //iDisplay.SetPixel(10, 10, 0xFFFFFFFF);
-
-            iDisplay.Fill();
+            // Set maximum pixels coordinates
+            iNumericX.Maximum = iDisplay.WidthInPixels()-1;
+            iNumericY.Maximum = iDisplay.HeightInPixels()-1;
+            //
+            iDisplay.Clear();
+            iDisplay.SwapBuffers();
         }
 
         private void iButtonOpen_Click(object sender, EventArgs e)
@@ -50,6 +53,17 @@ namespace MiniDisplayDemo
         {
             iDisplay.Clear();
             iDisplay.SwapBuffers();
+        }
+
+        private void iButonSetPixel_Click(object sender, EventArgs e)
+        {
+            iDisplay.SetPixel((int)iNumericX.Value, (int)iNumericY.Value, 1);
+            iDisplay.SwapBuffers();
+        }
+
+        private void FormMain_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

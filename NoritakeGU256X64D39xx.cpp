@@ -39,11 +39,34 @@ void TReportDataProcessor<unsigned char>::Copy(unsigned char* aDestination, unsi
 
 // Specialization for buffer copy
 template<>
-void TReportDataProcessor<unsigned char*>::Copy(unsigned char* aDestination, unsigned char* aData, int aSize)
+void TReportDataProcessor<unsigned char*&>::Copy(unsigned char* aDestination, unsigned char*& aData, int aSize)
 {
+    // Copy our data in place
     memcpy(aDestination, aData, aSize);
+    // Advance our pointer
+    aData += aSize;
 }
 
+GU256X64D39XX::GU256X64D39XX() :
+    iFrameNext(NULL),
+    iFrameCurrent(NULL),
+    iFrameAlpha(NULL),
+    iFrameBeta(NULL)
+{
+
+}
+
+GU256X64D39XX::~GU256X64D39XX()
+{
+    iFrameNext = NULL;
+    iFrameCurrent = NULL;
+    //
+    delete iFrameAlpha;
+    iFrameAlpha = NULL;
+    //
+    delete iFrameBeta;
+    iFrameBeta = NULL;
+}
 
 /**
 */
@@ -53,24 +76,16 @@ int GU256X64D39XX::Open()
     if (success)
     {
         //Allocate both frames
-        /*
         delete iFrameAlpha;
         iFrameAlpha = NULL;
-        iFrameAlpha = new BitArrayHigh(KGP12xFrameBufferPixelCount);
+        iFrameAlpha = new BitArrayLow(KFrameBufferPixelCount);
         //
         delete iFrameBeta;
         iFrameBeta = NULL;
-        iFrameBeta = new BitArrayHigh(KGP12xFrameBufferPixelCount);
-        //
-        delete iFrameGamma;
-        iFrameGamma = NULL;
-        iFrameGamma = new BitArrayHigh(KGP12xFrameBufferPixelCount);
+        iFrameBeta = new BitArrayLow(KFrameBufferPixelCount);
         //
         iFrameNext = iFrameAlpha;
         iFrameCurrent = iFrameBeta;
-        iFramePrevious = iFrameGamma;
-        */
-
 
         //To make sure it is synced properly
         //iNeedFullFrameUpdate = 0;
@@ -87,7 +102,16 @@ int GU256X64D39XX::Open()
 
 void GU256X64D39XX::SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel)
 {
+    bool on = (aPixel & 0x00FFFFFF) != 0x00000000;
 
+    if (on)
+    {
+        iFrameCurrent->SetBit(aX*HeightInPixels() + aY);
+    }
+    else
+    {
+        iFrameCurrent->ClearBit(aX*HeightInPixels() + aY);
+    }
 }
 
 void GU256X64D39XX::SetAllPixels(unsigned char aPattern)
@@ -102,14 +126,14 @@ void GU256X64D39XX::SetBrightness(int aBrightness)
 
 void GU256X64D39XX::Clear()
 {
-    CmdBitImageWrite<unsigned char>(0x0000, 0x0800,0x00);
+    iFrameCurrent->ClearAll();
 }
 
 /*
 */
 void GU256X64D39XX::Fill()
 {
-    CmdBitImageWrite<unsigned char>(0x0000, 0x0800, 0xFF);
+    iFrameCurrent->SetAll();
 }
 
 /**
@@ -186,9 +210,16 @@ int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short a
     return 0;
 }
 
+/*
+*/
 void GU256X64D39XX::SwapBuffers()
 {
-
+    // Our template needs to pointer reference to be able advance it.
+    // Therefore we take a local copy...
+    unsigned char* ptr = iFrameCurrent->Ptr();
+    // ...and pass its reference to our template function.
+    // That requires explicitly specifying the template parameter.
+    CmdBitImageWrite<unsigned char*&>(0x0, iFrameCurrent->SizeInBytes(), ptr);
 }
 
 

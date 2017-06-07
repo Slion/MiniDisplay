@@ -30,6 +30,9 @@
 class GU256X64D39XX : public ArduinoGraphicDisplay
 {
 public:
+    GU256X64D39XX();
+    virtual ~GU256X64D39XX();
+
     //From DisplayBase
     virtual int Open();
     virtual void SetPixel(unsigned char aX, unsigned char aY, unsigned int aPixel);
@@ -57,7 +60,12 @@ public:
     static const int KFrameBufferSizeInBytes = KWidthInPixels*KHeightInPixels / KPixelsPerByte; //256*64/8=2048
     static const int KFrameBufferPixelCount = KWidthInPixels*KHeightInPixels;
 
+public:
+    BitArrayLow* iFrameCurrent; //Used
+    BitArrayLow* iFrameNext; //Used
 
+    BitArrayLow* iFrameAlpha; //Owned
+    BitArrayLow* iFrameBeta; //Owned
 };
 
 

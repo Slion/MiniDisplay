@@ -32,6 +32,11 @@
             this.iButtonClose = new System.Windows.Forms.Button();
             this.iButtonFill = new System.Windows.Forms.Button();
             this.iButtonClear = new System.Windows.Forms.Button();
+            this.iButtonSetPixel = new System.Windows.Forms.Button();
+            this.iNumericX = new System.Windows.Forms.NumericUpDown();
+            this.iNumericY = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).BeginInit();
             this.SuspendLayout();
             // 
             // iButtonOpen
@@ -74,17 +79,47 @@
             this.iButtonClear.UseVisualStyleBackColor = true;
             this.iButtonClear.Click += new System.EventHandler(this.iButtonClear_Click);
             // 
+            // iButtonSetPixel
+            // 
+            this.iButtonSetPixel.Location = new System.Drawing.Point(197, 70);
+            this.iButtonSetPixel.Name = "iButtonSetPixel";
+            this.iButtonSetPixel.Size = new System.Drawing.Size(75, 23);
+            this.iButtonSetPixel.TabIndex = 4;
+            this.iButtonSetPixel.Text = "Set pixel";
+            this.iButtonSetPixel.UseVisualStyleBackColor = true;
+            this.iButtonSetPixel.Click += new System.EventHandler(this.iButonSetPixel_Click);
+            // 
+            // iNumericX
+            // 
+            this.iNumericX.Location = new System.Drawing.Point(183, 12);
+            this.iNumericX.Name = "iNumericX";
+            this.iNumericX.Size = new System.Drawing.Size(89, 20);
+            this.iNumericX.TabIndex = 5;
+            // 
+            // iNumericY
+            // 
+            this.iNumericY.Location = new System.Drawing.Point(183, 44);
+            this.iNumericY.Name = "iNumericY";
+            this.iNumericY.Size = new System.Drawing.Size(89, 20);
+            this.iNumericY.TabIndex = 6;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.iNumericY);
+            this.Controls.Add(this.iNumericX);
+            this.Controls.Add(this.iButtonSetPixel);
             this.Controls.Add(this.iButtonClear);
             this.Controls.Add(this.iButtonFill);
             this.Controls.Add(this.iButtonClose);
             this.Controls.Add(this.iButtonOpen);
             this.Name = "FormMain";
-            this.Text = "Form1";
+            this.Text = "Mini Display Demo";
+            this.Load += new System.EventHandler(this.FormMain_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -95,6 +130,9 @@
         private System.Windows.Forms.Button iButtonClose;
         private System.Windows.Forms.Button iButtonFill;
         private System.Windows.Forms.Button iButtonClear;
+        private System.Windows.Forms.Button iButtonSetPixel;
+        private System.Windows.Forms.NumericUpDown iNumericX;
+        private System.Windows.Forms.NumericUpDown iNumericY;
     }
 }
 
