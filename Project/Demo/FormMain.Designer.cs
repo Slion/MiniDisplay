@@ -35,6 +35,8 @@
             this.iButtonSetPixel = new System.Windows.Forms.Button();
             this.iNumericX = new System.Windows.Forms.NumericUpDown();
             this.iNumericY = new System.Windows.Forms.NumericUpDown();
+            this.iLabelX = new System.Windows.Forms.Label();
+            this.iLabelY = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).BeginInit();
             this.SuspendLayout();
@@ -103,11 +105,31 @@
             this.iNumericY.Size = new System.Drawing.Size(89, 20);
             this.iNumericY.TabIndex = 6;
             // 
+            // iLabelX
+            // 
+            this.iLabelX.AutoSize = true;
+            this.iLabelX.Location = new System.Drawing.Point(160, 14);
+            this.iLabelX.Name = "iLabelX";
+            this.iLabelX.Size = new System.Drawing.Size(17, 13);
+            this.iLabelX.TabIndex = 7;
+            this.iLabelX.Text = "X:";
+            // 
+            // iLabelY
+            // 
+            this.iLabelY.AutoSize = true;
+            this.iLabelY.Location = new System.Drawing.Point(160, 46);
+            this.iLabelY.Name = "iLabelY";
+            this.iLabelY.Size = new System.Drawing.Size(17, 13);
+            this.iLabelY.TabIndex = 8;
+            this.iLabelY.Text = "Y:";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.iLabelY);
+            this.Controls.Add(this.iLabelX);
             this.Controls.Add(this.iNumericY);
             this.Controls.Add(this.iNumericX);
             this.Controls.Add(this.iButtonSetPixel);
@@ -121,6 +143,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -133,6 +156,8 @@
         private System.Windows.Forms.Button iButtonSetPixel;
         private System.Windows.Forms.NumericUpDown iNumericX;
         private System.Windows.Forms.NumericUpDown iNumericY;
+        private System.Windows.Forms.Label iLabelX;
+        private System.Windows.Forms.Label iLabelY;
     }
 }
 
