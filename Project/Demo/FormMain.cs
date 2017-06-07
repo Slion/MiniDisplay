@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpLib.MiniDisplay;
+using System.Drawing.Imaging;
 
 namespace MiniDisplayDemo
 {
@@ -15,6 +16,7 @@ namespace MiniDisplayDemo
     {
         Display iDisplay;
         DateTime iLastTickTime;
+        Bitmap iBitmap;
 
         public FormMain()
         {
@@ -24,12 +26,14 @@ namespace MiniDisplayDemo
             iDisplay.OnOpened += OnDisplayOpened;
             iDisplay.OnClosed += OnDisplayClosed;
             UpdateControls();
-            iNumericTimerInterval.Value = iTimer.Interval;
+            iNumericTimerInterval.Value = iTimer.Interval;            
         }
 
         public void OnDisplayOpened(Display aDisplay)
         {
             UpdateControls();
+            ResetBitmap();
+            //
             // Set maximum pixels coordinates
             iNumericX.Maximum = iDisplay.WidthInPixels()-1;
             iNumericY.Maximum = iDisplay.HeightInPixels()-1;
@@ -43,6 +47,12 @@ namespace MiniDisplayDemo
         {
             UpdateControls();
             TimerStop();
+        }
+
+        private void ResetBitmap()
+        {
+            iBitmap = new System.Drawing.Bitmap(iDisplay.WidthInPixels(), iDisplay.HeightInPixels(), PixelFormat.Format32bppArgb);
+            iPictureBoxDisplay.Image = iBitmap;
         }
 
         private void TimerStart()
@@ -66,6 +76,7 @@ namespace MiniDisplayDemo
             iButtonClose.Enabled = iDisplay.IsOpen();
             iButtonClear.Enabled = iDisplay.IsOpen();
             iButtonFill.Enabled = iDisplay.IsOpen();
+            iPictureBoxDisplay.Enabled = iDisplay.IsOpen();
         }
 
         private void iButtonOpen_Click(object sender, EventArgs e)
@@ -85,6 +96,7 @@ namespace MiniDisplayDemo
 
         private void iButtonClear_Click(object sender, EventArgs e)
         {
+            ResetBitmap();
             iDisplay.Clear();
         }
 
@@ -115,6 +127,19 @@ namespace MiniDisplayDemo
         private void iNumericTimerInterval_ValueChanged(object sender, EventArgs e)
         {
             iTimer.Interval = (int)iNumericTimerInterval.Value;
+        }
+
+        private void iPictureBoxDisplay_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (iDisplay.IsOpen() && e.Button==MouseButtons.Left 
+                && e.X>0 && e.X<iBitmap.Width
+                && e.Y > 0 && e.Y < iBitmap.Height)
+            {
+                // Set pixels in both bitmap and screen
+                iBitmap.SetPixel(e.X, e.Y, Color.Black);
+                iPictureBoxDisplay.Image = iBitmap; // Most ineficient I guess
+                iDisplay.SetPixel(e.X, e.Y, 1);
+            }                            
         }
     }
 }
