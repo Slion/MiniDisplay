@@ -47,7 +47,7 @@ public:
     virtual int FrameBufferSizeInBytes() const { return KFrameBufferSizeInBytes; }
 
 private:
-    void CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue);
+    int CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue);
 
 public:
     static const int KWidthInPixels = 256;

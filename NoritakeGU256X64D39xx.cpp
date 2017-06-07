@@ -94,8 +94,9 @@ void GU256X64D39XX::Fill()
  * @param aRamAddress Display RAM address at which to start copying our pixel data.
  * @param aSize Size in bytes of our pixel data.
  * @param aValue Byte value corresponding to 8 pixels on a vertical line.
+ * @return Zero on success. Positive number indicate not all data could be sent. Negative number means algorithm issue a too much data was sent.
  */
-void GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue)
+int GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, unsigned char aValue)
 {
     ArduinoReport report;
 
@@ -120,29 +121,43 @@ void GU256X64D39XX::CmdBitImageWrite(unsigned short aRamAddress, unsigned short 
     report[8] = (unsigned char)aSize; // Data size lower byte
     report[9] = aSize>>8; // Data size higher byte
     
+    int remainingSize = aSize;
     int sizeWritten = MIN(aSize, report.Size() - KReportCmdHeaderSize);
     memset(report.Buffer() + KReportCmdHeaderSize, aValue, sizeWritten);
     while (Write(report) != report.Size() && retry-->0);
     if (retry < 0)
     {
         // Abort since we can't sent our command header
-        return;
+        return remainingSize;
     }
     retry = KMaxRetry; // Rearm
-
-    int remainingSize = aSize; // -sizeWritten;
+    remainingSize -= sizeWritten;
     //We need to keep on sending our pixel data until we are done
-    while (report[1] == KMaxDataSizePerReport)
+    while (remainingSize>0)
     {
         report.Reset();
-        remainingSize -= sizeWritten;
         report[0] = 0x00; //Report ID
         report[1] = MIN(remainingSize, KMaxDataSizePerReport); //Report length, should be 64 or the remaining size
         sizeWritten = report[1];
         memset(report.Buffer() + KReportMinHeaderSize, aValue, sizeWritten);
         while (Write(report) != report.Size() && retry-->0);
+        if (retry < 0)
+        {
+            // Error, can't recover from here
+            break;
+        }
         retry = KMaxRetry; // Rearm
+        remainingSize -= sizeWritten;
     }
+
+    if (remainingSize != 0)
+    {
+        // Silence error for now
+        return remainingSize;
+    }
+
+    // Success
+    return 0;
 }
 
 void GU256X64D39XX::SwapBuffers()
