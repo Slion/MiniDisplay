@@ -33,13 +33,10 @@ namespace MiniDisplayDemo
         public void OnDisplayOpened(Display aDisplay)
         {
             UpdateControls();
-            ResetBitmap();
-            //
-            // Set maximum pixels coordinates
-            iNumericX.Maximum = iDisplay.WidthInPixels()-1;
-            iNumericY.Maximum = iDisplay.HeightInPixels()-1;
+            ResetBitmap(Color.White);
             //
             iDisplay.Clear();
+            iDisplay.SetBrightness(iDisplay.MaxBrightness());
             TimerStart();
             //iDisplay.SwapBuffers();
         }
@@ -50,14 +47,14 @@ namespace MiniDisplayDemo
             TimerStop();
         }
 
-        private void ResetBitmap()
+        private void ResetBitmap(Color aColor)
         {
             iBitmap = new System.Drawing.Bitmap(iDisplay.WidthInPixels(), iDisplay.HeightInPixels(), PixelFormat.Format32bppArgb);
             for (int i = 0; i < iBitmap.Width; i++)
             {
                 for (int j = 0; j < iBitmap.Height; j++)
                 {
-                    iBitmap.SetPixel(i, j, Color.White);
+                    iBitmap.SetPixel(i, j, aColor);
                 }
             }
             iPictureBoxDisplay.Image = iBitmap;
@@ -88,6 +85,19 @@ namespace MiniDisplayDemo
             iButtonClear.Enabled = iDisplay.IsOpen();
             iButtonFill.Enabled = iDisplay.IsOpen();
             iPictureBoxDisplay.Enabled = iDisplay.IsOpen();
+            iTrackBarBrightness.Enabled = iDisplay.IsOpen();
+
+            if (iDisplay.IsOpen())
+            {
+                //
+                // Set maximum pixels coordinates
+                iNumericX.Maximum = iDisplay.WidthInPixels() - 1;
+                iNumericY.Maximum = iDisplay.HeightInPixels() - 1;
+                //
+                iTrackBarBrightness.Minimum = iDisplay.MinBrightness();
+                iTrackBarBrightness.Maximum = iDisplay.MaxBrightness();
+                iTrackBarBrightness.Value = iDisplay.MaxBrightness();
+            }
         }
 
         private void iButtonOpen_Click(object sender, EventArgs e)
@@ -102,13 +112,14 @@ namespace MiniDisplayDemo
 
         private void iButtonFill_Click(object sender, EventArgs e)
         {
-            iDisplay.Fill();
+            ResetBitmap(Color.Black);
+            //iDisplay.Fill();
         }
 
         private void iButtonClear_Click(object sender, EventArgs e)
         {
-            ResetBitmap();
-            iDisplay.Clear();
+            ResetBitmap(Color.White);
+            //iDisplay.Clear();
         }
 
         private void iButonSetPixel_Click(object sender, EventArgs e)
@@ -178,6 +189,11 @@ namespace MiniDisplayDemo
                 iPictureBoxDisplay.Image = iBitmap; // Most ineficient I guess
                 //iDisplay.SetPixel(e.X, e.Y, 1);
             }                            
+        }
+
+        private void iTrackBarBrightness_Scroll(object sender, EventArgs e)
+        {
+            iDisplay.SetBrightness(iTrackBarBrightness.Value);
         }
     }
 }

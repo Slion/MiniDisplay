@@ -109,7 +109,7 @@ void GU256X64D39XX::SetAllPixels(unsigned char aPattern)
 
 void GU256X64D39XX::SetBrightness(int aBrightness)
 {
-
+    CmdBrightnessLevelSetting(aBrightness);
 }
 
 void GU256X64D39XX::Clear()
@@ -213,6 +213,29 @@ int GU256X64D39XX::CmdSpecifyDisplayStartAddress(unsigned short aRamAddress)
     report[5] = 0x53; // Command: Specifiy Display Start Address
     report[6] = (unsigned char)aRamAddress; // Write address lower byte
     report[7] = aRamAddress >> 8; // Write address higher byte
+    while (Write(report) != report.Size() && retry-->0);
+    if (retry < 0)
+    {
+        // Abort since we can't send our command header
+        return report.Size();
+    }
+    return 0;
+}
+
+/*
+*/
+int GU256X64D39XX::CmdBrightnessLevelSetting(unsigned char aBrightness)
+{
+    const int KMaxRetry = 100;
+    int retry = KMaxRetry;
+    ArduinoReport report;
+    report[0] = 0x00; //Report ID
+    report[1] = 0x05; //Report length excluding first two bytes.
+    report[2] = 0x02; // STX header
+    report[3] = 0x44; // Header 2
+    report[4] = 0xFF; // Display address: broadcast
+    report[5] = 0x58; // Command: Brightness level setting
+    report[6] = aBrightness; // Write address lower byte
     while (Write(report) != report.Size() && retry-->0);
     if (retry < 0)
     {

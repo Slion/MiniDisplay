@@ -45,8 +45,8 @@ public:
     virtual void SwapBuffers();
 
     //From GraphicDisplay
-    virtual int MinBrightness() const { return 0; }
-    virtual int MaxBrightness() const { return 4; }
+    virtual int MinBrightness() const { return 0x10; }
+    virtual int MaxBrightness() const { return 0x18; }
     virtual int WidthInPixels() const { return KWidthInPixels; }
     virtual int HeightInPixels() const { return KHeightInPixels; }
     virtual int FrameBufferSizeInBytes() const { return KFrameBufferSizeInBytes; }
@@ -55,6 +55,7 @@ private:
     template<typename T>
     int CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, T aData);
     int CmdSpecifyDisplayStartAddress(unsigned short aAddress);
+    int CmdBrightnessLevelSetting(unsigned char aBrightness);
 
 public:
     static const int KWidthInPixels = 256;

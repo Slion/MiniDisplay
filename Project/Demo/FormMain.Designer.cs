@@ -43,10 +43,12 @@
             this.iLabelTimerInterval = new System.Windows.Forms.Label();
             this.iLabelFps = new System.Windows.Forms.Label();
             this.iPictureBoxDisplay = new System.Windows.Forms.PictureBox();
+            this.iTrackBarBrightness = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericTimerInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.iPictureBoxDisplay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iTrackBarBrightness)).BeginInit();
             this.SuspendLayout();
             // 
             // iButtonOpen
@@ -92,7 +94,7 @@
             // iButtonSetPixel
             // 
             this.iButtonSetPixel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.iButtonSetPixel.Location = new System.Drawing.Point(307, 67);
+            this.iButtonSetPixel.Location = new System.Drawing.Point(263, 70);
             this.iButtonSetPixel.Name = "iButtonSetPixel";
             this.iButtonSetPixel.Size = new System.Drawing.Size(75, 23);
             this.iButtonSetPixel.TabIndex = 4;
@@ -103,7 +105,7 @@
             // iNumericX
             // 
             this.iNumericX.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.iNumericX.Location = new System.Drawing.Point(307, 9);
+            this.iNumericX.Location = new System.Drawing.Point(263, 12);
             this.iNumericX.Name = "iNumericX";
             this.iNumericX.Size = new System.Drawing.Size(75, 20);
             this.iNumericX.TabIndex = 5;
@@ -111,7 +113,7 @@
             // iNumericY
             // 
             this.iNumericY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.iNumericY.Location = new System.Drawing.Point(307, 41);
+            this.iNumericY.Location = new System.Drawing.Point(263, 44);
             this.iNumericY.Name = "iNumericY";
             this.iNumericY.Size = new System.Drawing.Size(75, 20);
             this.iNumericY.TabIndex = 6;
@@ -120,7 +122,7 @@
             // 
             this.iLabelX.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.iLabelX.AutoSize = true;
-            this.iLabelX.Location = new System.Drawing.Point(284, 11);
+            this.iLabelX.Location = new System.Drawing.Point(240, 14);
             this.iLabelX.Name = "iLabelX";
             this.iLabelX.Size = new System.Drawing.Size(17, 13);
             this.iLabelX.TabIndex = 7;
@@ -130,7 +132,7 @@
             // 
             this.iLabelY.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.iLabelY.AutoSize = true;
-            this.iLabelY.Location = new System.Drawing.Point(284, 43);
+            this.iLabelY.Location = new System.Drawing.Point(240, 46);
             this.iLabelY.Name = "iLabelY";
             this.iLabelY.Size = new System.Drawing.Size(17, 13);
             this.iLabelY.TabIndex = 8;
@@ -144,7 +146,7 @@
             // iNumericTimerInterval
             // 
             this.iNumericTimerInterval.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.iNumericTimerInterval.Location = new System.Drawing.Point(307, 99);
+            this.iNumericTimerInterval.Location = new System.Drawing.Point(263, 102);
             this.iNumericTimerInterval.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -164,7 +166,7 @@
             // 
             this.iLabelTimerInterval.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.iLabelTimerInterval.AutoSize = true;
-            this.iLabelTimerInterval.Location = new System.Drawing.Point(203, 101);
+            this.iLabelTimerInterval.Location = new System.Drawing.Point(159, 104);
             this.iLabelTimerInterval.Name = "iLabelTimerInterval";
             this.iLabelTimerInterval.Size = new System.Drawing.Size(98, 13);
             this.iLabelTimerInterval.TabIndex = 10;
@@ -192,11 +194,24 @@
             this.iPictureBoxDisplay.TabStop = false;
             this.iPictureBoxDisplay.MouseMove += new System.Windows.Forms.MouseEventHandler(this.iPictureBoxDisplay_MouseMove);
             // 
+            // iTrackBarBrightness
+            // 
+            this.iTrackBarBrightness.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.iTrackBarBrightness.BackColor = System.Drawing.SystemColors.Control;
+            this.iTrackBarBrightness.Location = new System.Drawing.Point(355, 12);
+            this.iTrackBarBrightness.Name = "iTrackBarBrightness";
+            this.iTrackBarBrightness.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.iTrackBarBrightness.Size = new System.Drawing.Size(45, 292);
+            this.iTrackBarBrightness.TabIndex = 13;
+            this.iTrackBarBrightness.Scroll += new System.EventHandler(this.iTrackBarBrightness_Scroll);
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(394, 310);
+            this.ClientSize = new System.Drawing.Size(403, 310);
+            this.Controls.Add(this.iTrackBarBrightness);
             this.Controls.Add(this.iPictureBoxDisplay);
             this.Controls.Add(this.iLabelFps);
             this.Controls.Add(this.iLabelTimerInterval);
@@ -217,6 +232,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.iNumericY)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iNumericTimerInterval)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.iPictureBoxDisplay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.iTrackBarBrightness)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -238,6 +254,7 @@
         private System.Windows.Forms.Label iLabelTimerInterval;
         private System.Windows.Forms.Label iLabelFps;
         private System.Windows.Forms.PictureBox iPictureBoxDisplay;
+        private System.Windows.Forms.TrackBar iTrackBarBrightness;
     }
 }
 
