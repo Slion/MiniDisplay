@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>SharpLibMiniDisplay</id>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <title>Mini Display Library</title>
         <authors>Stéphane Lenclud</authors>
         <licenseUrl>https://www.gnu.org/copyleft/gpl.html</licenseUrl>
@@ -10,7 +10,9 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Provide a .NET interface to drive some Futaba and Noritake VFD displays.</description>
         <summary>Currently only supports HID USB conections.</summary>
-        <releaseNotes>v1.0.0
+        <releaseNotes>v1.0.1
+Adding missing Noritake display name.
+v1.0.0
 Adding support for Noritake GU256x64D-39xx over Arduino Micro through parallel interface using Graphic DMA mode.
 v0.0.2
 Fixing DLL path.

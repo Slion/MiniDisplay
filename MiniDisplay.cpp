@@ -33,6 +33,7 @@ wchar_t* KDisplayNames[]=
 	L"Futaba GP1212A01",
 	L"Futaba GP1212A02",
 	L"Futaba MDM166AA",
+    L"Noritake GU256x64x-39xx",
 	L"Unknown display device"
 	};
 
