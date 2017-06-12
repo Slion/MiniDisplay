@@ -7,7 +7,7 @@ By Stéphane Lenclud
 Using serial port is handy for debug.
 However is causes pixel noise issues on Adruino Micro.
 This is not an issue on Teensy 3.2.
-Therefore Teensy 3.2 is our recommanded board.
+Therefore Teensy 3.2 is our recommended board.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
