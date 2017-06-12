@@ -56,6 +56,7 @@ private:
     int CmdBitImageWrite(unsigned short aRamAddress, unsigned short aSize, T aData);
     int CmdSpecifyDisplayStartAddress(unsigned short aAddress);
     int CmdBrightnessLevelSetting(unsigned char aBrightness);
+    int CmdSpecifyDisplaySynchronisation();
 
 public:
     static const int KWidthInPixels = 256;

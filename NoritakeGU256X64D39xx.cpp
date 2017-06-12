@@ -65,7 +65,8 @@ GU256X64D39XX::~GU256X64D39XX()
 */
 int GU256X64D39XX::Open()
 {
-    int success = HidDevice::Open(KArduinoVendorId, KArduinoMicroProductId, NULL);
+    //int success = HidDevice::Open(KArduinoVendorId, KArduinoMicroProductId, NULL);
+    int success = HidDevice::Open(KTeensyVendorId, KTeensy3Dot2ProductId, NULL);    
     if (success)
     {
         // Make sure our frame buffer addres is in sync
@@ -222,6 +223,30 @@ int GU256X64D39XX::CmdSpecifyDisplayStartAddress(unsigned short aRamAddress)
     return 0;
 }
 
+
+/*
+*/
+int GU256X64D39XX::CmdSpecifyDisplaySynchronisation()
+{
+    const int KMaxRetry = 100;
+    int retry = KMaxRetry;
+    ArduinoReport report;
+    report[0] = 0x00; //Report ID
+    report[1] = 0x05; //Report length excluding first two bytes.
+    report[2] = 0x02; // STX header
+    report[3] = 0x44; // Header 2
+    report[4] = 0xFF; // Display address: broadcast
+    report[5] = 0x57; // Command: Specifiy Display Synchronisation
+    report[6] = 0x01; // Hard coded too
+    while (Write(report) != report.Size() && retry-->0);
+    if (retry < 0)
+    {
+        // Abort since we can't send our command header
+        return report.Size();
+    }
+    return 0;
+}
+
 /*
 */
 int GU256X64D39XX::CmdBrightnessLevelSetting(unsigned char aBrightness)
@@ -255,8 +280,10 @@ void GU256X64D39XX::SwapBuffers()
     // ...and pass its reference to our template function.
     // That requires explicitly specifying the template parameter.
     CmdBitImageWrite<unsigned char*&>(iOffScreenBufferAddress, iFrame->SizeInBytes(), ptr);
+    //CmdSpecifyDisplaySynchronisation();
     if (!CmdSpecifyDisplayStartAddress(iOffScreenBufferAddress))
     {
+        //CmdSpecifyDisplaySynchronisation();
         // Only register our swap if there was no error
         unsigned short screenAddress = iOffScreenBufferAddress;
         iOffScreenBufferAddress = iScreenBufferAddress;

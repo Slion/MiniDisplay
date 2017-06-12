@@ -33,6 +33,10 @@ const int KArduinoMaxHidReportSize = 65; // Header and a full screen worth of da
 const unsigned short KArduinoVendorId = 0x2341;
 const unsigned short KArduinoMicroProductId = 0x8037;
 
+const unsigned short KTeensyVendorId = 0x16C0;
+const unsigned short KTeensy3Dot2ProductId = 0x0486;
+
+
 
 //typedef struct hid_device_info HidDeviceInfo;
 
