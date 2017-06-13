@@ -36,6 +36,7 @@ public:
 	//
     int Open(const char* aPath);
     int Open(unsigned short aVendorId, unsigned short aProductId, const wchar_t* aSerialNumber);
+    int Open(unsigned short aVendorId, unsigned short aProductId, unsigned short aUsagePage, unsigned short aUsage);
     void Close();
     bool IsOpen();
     //

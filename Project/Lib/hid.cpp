@@ -515,6 +515,37 @@ void  HID_API_EXPORT HID_API_CALL hid_free_enumeration(struct hid_device_info *d
 }
 
 
+HID_API_EXPORT hid_device * HID_API_CALL hid_open_usage(unsigned short vendor_id, unsigned short product_id, unsigned short usage_page, unsigned short usage)
+{
+    /* TODO: Merge this functions with the Linux version. This function should be platform independent. */
+    struct hid_device_info *devs, *cur_dev;
+    const char *path_to_open = NULL;
+    hid_device *handle = NULL;
+
+    devs = hid_enumerate(vendor_id, product_id);
+    cur_dev = devs;
+    while (cur_dev) {
+        if (cur_dev->vendor_id == vendor_id &&
+            cur_dev->product_id == product_id &&
+            cur_dev->usage_page == usage_page &&
+            cur_dev->usage == usage) {
+            path_to_open = cur_dev->path;
+            break;
+        }
+        cur_dev = cur_dev->next;
+    }
+
+    if (path_to_open) {
+        /* Open the device */
+        handle = hid_open_path(path_to_open);
+    }
+
+    hid_free_enumeration(devs);
+
+    return handle;
+}
+
+
 HID_API_EXPORT hid_device * HID_API_CALL hid_open(unsigned short vendor_id, unsigned short product_id, const wchar_t *serial_number)
 {
 	/* TODO: Merge this functions with the Linux version. This function should be platform independent. */

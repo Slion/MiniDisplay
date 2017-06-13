@@ -66,7 +66,13 @@ GU256X64D39XX::~GU256X64D39XX()
 int GU256X64D39XX::Open()
 {
     //int success = HidDevice::Open(KArduinoVendorId, KArduinoMicroProductId, NULL);
-    int success = HidDevice::Open(KTeensyVendorId, KTeensy3Dot2ProductId, NULL);    
+    //int success = HidDevice::Open(KTeensyVendorId, KTeensy3Dot2ProductId, NULL);   
+    //int success = HidDevice::Open("\\\\?\\HID#VID_16C0&PID_0486&MI_00#a&fdfa564&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}");
+
+    // Since Teensy 3.2 exposes 2 devices in Raw HID mode we need to make sure we open the correct one by specifying page and usage
+    // One is the actual Raw HID the other one is used for virtual Serial coms.
+    // Openeing the Serial coms one will hang as soon as you try to send an HID report.
+    int success = HidDevice::Open(KTeensyVendorId, KTeensy3Dot2ProductId, 0xFFAB, 0x0200);    
     if (success)
     {
         // Make sure our frame buffer addres is in sync

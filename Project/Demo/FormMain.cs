@@ -38,7 +38,8 @@ namespace MiniDisplayDemo
             iDisplay.Clear();
             iDisplay.SetBrightness(iDisplay.MaxBrightness());
             TimerStart();
-            //iDisplay.SwapBuffers();
+            //TimerStop();
+            //UpdateFrame();
         }
 
         public void OnDisplayClosed(Display aDisplay)
@@ -113,12 +114,14 @@ namespace MiniDisplayDemo
         private void iButtonFill_Click(object sender, EventArgs e)
         {
             ResetBitmap(Color.Black);
+            //UpdateFrame();
             //iDisplay.Fill();
         }
 
         private void iButtonClear_Click(object sender, EventArgs e)
         {
             ResetBitmap(Color.White);
+            //UpdateFrame();
             //iDisplay.Clear();
         }
 
@@ -136,6 +139,23 @@ namespace MiniDisplayDemo
         {
             DateTime newTickTime = DateTime.Now;
 
+            UpdateFrame();
+
+            DateTime afterRender = DateTime.Now;
+            // Compute FPS
+            iLabelFps.Text = (1.0 / newTickTime.Subtract(iLastTickTime).TotalSeconds).ToString("F0") + " / " +
+                                           (1000 / iTimer.Interval).ToString() + " FPS - " +
+                                           afterRender.Subtract(newTickTime).TotalMilliseconds + " ms";
+
+
+            iLastTickTime = newTickTime;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateFrame()
+        {
             //
             // Send it to our display
             // Watch performance of that loop
@@ -151,7 +171,7 @@ namespace MiniDisplayDemo
                     {
                         //Get pixel color
                         // We need to reverse our color so as to light up the black pixels
-                        uint color = ~(pixels[j*bitmap.Width+i]);
+                        uint color = ~(pixels[j * bitmap.Width + i]);
 
                         //Now set our pixel
                         // We spend almost 10ms in there in debug maybe only 2ms in release
@@ -159,18 +179,10 @@ namespace MiniDisplayDemo
                     }
                 }
                 iBitmap.UnlockBits(bitmap);
-            }            
+            }
 
             iDisplay.SwapBuffers();
 
-            DateTime afterRender = DateTime.Now;
-            // Compute FPS
-            iLabelFps.Text = (1.0 / newTickTime.Subtract(iLastTickTime).TotalSeconds).ToString("F0") + " / " +
-                                           (1000 / iTimer.Interval).ToString() + " FPS - " +
-                                           afterRender.Subtract(newTickTime).TotalMilliseconds + " ms";
-
-
-            iLastTickTime = newTickTime;
         }
 
         private void iNumericTimerInterval_ValueChanged(object sender, EventArgs e)

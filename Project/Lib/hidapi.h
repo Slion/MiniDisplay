@@ -159,6 +159,13 @@ extern "C" {
 		*/
 		HID_API_EXPORT hid_device * HID_API_CALL hid_open(unsigned short vendor_id, unsigned short product_id, const wchar_t *serial_number);
 
+        /**
+         SL:
+         Added to be able to open a a specific usage_page/usage combination from a given vendor/product.
+         That was needed for Teensy in Raw HID mode.
+        */
+        HID_API_EXPORT hid_device * HID_API_CALL hid_open_usage(unsigned short vendor_id, unsigned short product_id, unsigned short usage_page, unsigned short usage);
+
 		/** @brief Open a HID device by its path name.
 
 			The path name be determined by calling hid_enumerate(), or a

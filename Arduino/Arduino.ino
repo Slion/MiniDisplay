@@ -243,8 +243,10 @@ void loop()
     {
         isIdle = false;
         int byteCount = rawhidData[0];
-        //Serial.print("byteCount: ");
-        //Serial.println(byteCount);
+#ifdef SLOG
+        Serial.print("byteCount: ");
+        Serial.println(byteCount);
+#endif
         int i = 0;
         while (i<sizeof(rawhidData) && i++<byteCount)
         {
@@ -291,7 +293,9 @@ void loop()
     {
         // Going idle then 
         isIdle = true;
-        //Serial.println("-------------------------");
+#ifdef SLOG
+        Serial.println("-------------------------");
+#endif
     }
 }
 

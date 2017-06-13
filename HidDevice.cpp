@@ -76,6 +76,26 @@ int HidDevice::Open(unsigned short aVendorId, unsigned short aProductId, const w
 	}
 
 /**
+See hidapi documentation.
+*/
+int HidDevice::Open(unsigned short aVendorId, unsigned short aProductId, unsigned short aUsagePage, unsigned short aUsage)
+{
+    Close();
+
+    iHidDevice = hid_open_usage(aVendorId, aProductId, aUsagePage, aUsage);
+
+    if (!iHidDevice)
+    {
+        //Fail to connect our device
+        return 0;
+    }
+
+    FetchStrings();
+
+    return 1;
+}
+
+/**
 Close this HID device
 */
 void HidDevice::Close()
