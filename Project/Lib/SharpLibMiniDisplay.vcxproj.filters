@@ -63,6 +63,9 @@
     <ClInclude Include="..\..\NoritakeGU256X64D39xx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\FutabaMDM140AA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SharpLibMiniDisplay.cpp">
@@ -105,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\NoritakeGU256X64D39xx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\FutabaMDM140AA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

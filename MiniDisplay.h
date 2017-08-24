@@ -45,6 +45,7 @@ typedef enum
 	EMiniDisplayAutoDetect=0,
     EMiniDisplayFutabaGP1212A01,
     EMiniDisplayFutabaGP1212A02,
+    EMiniDisplayFutabaMDM140AA, // Fujistu Scaleo E, AKA DM-140GINK
 	EMiniDisplayFutabaMDM166AA,
     EMiniDisplayNoritakeGU256X64D39XX,
 	EMiniDisplayAutoDetectFailed
@@ -62,10 +63,11 @@ TMiniDisplayRequest;
 
 /**
 Define the various type of icons we support.
-For binary compatibility new entries must be added at the end.
+For binary compatibility new entries must be added just before EMiniDisplayIconCount.
 */
 typedef enum
     {
+    // Base icons support for Futaba MDM166AA
     EMiniDisplayIconNetworkSignal=0,
 	EMiniDisplayIconInternet,
     EMiniDisplayIconEmail,
@@ -74,7 +76,15 @@ typedef enum
 	EMiniDisplayIconVolumeLabel,
 	EMiniDisplayIconPlay,
 	EMiniDisplayIconPause,
-	EMiniDisplayIconRecording
+	EMiniDisplayIconRecording,
+    // Added to support Futaba MDM140AA, AKA Fujitsu Scaleo E, AKA DM-140GINK
+    EMiniDisplayIconRewind,
+    EMiniDisplayIconForward,
+    EMiniDisplayIconDvd,
+    EMiniDisplayIconCd,
+    EMiniDisplayIconVcd,
+    // Add here new icon semantics
+    EMiniDisplayIconCount,
     }
 TMiniDisplayIconType;
 

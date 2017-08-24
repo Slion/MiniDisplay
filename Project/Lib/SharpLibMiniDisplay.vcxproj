@@ -139,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ArduinoDisplay.h" />
+    <ClInclude Include="..\..\FutabaMDM140AA.h" />
     <ClInclude Include="..\..\FutabaVfd.h" />
     <ClInclude Include="..\..\MiniDisplay.h" />
     <ClInclude Include="..\..\BitArray.h" />
@@ -157,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ArduinoDisplay.cpp" />
+    <ClCompile Include="..\..\FutabaMDM140AA.cpp" />
     <ClCompile Include="..\..\MiniDisplay.cpp" />
     <ClCompile Include="..\..\BitArray.cpp" />
     <ClCompile Include="..\..\FutabaGP1212.cpp" />

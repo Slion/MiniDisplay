@@ -8,22 +8,27 @@
 using namespace System;
 
 
-
+/// Define our C++/CLI interface
 namespace SharpLib::MiniDisplay
 {
 
     //TODO: get proper definition
     public enum class IconType
     {
-        NetworkSignal = 0,
-        Internet = 1,
-        Email = 2,
-        Mute = 3,
-        Volume = 4,
-        VolumeLabel = 5,
-        Play = 6,
-        Pause = 7,
-        Recording = 8
+        NetworkSignal = EMiniDisplayIconNetworkSignal,
+        Internet = EMiniDisplayIconInternet,
+        Email = EMiniDisplayIconEmail,
+        Mute = EMiniDisplayIconMute,
+        Volume = EMiniDisplayIconVolume,
+        VolumeLabel = EMiniDisplayIconVolumeLabel,
+        Play = EMiniDisplayIconPlay,
+        Pause = EMiniDisplayIconPause,
+        Recording = EMiniDisplayIconRecording,
+        Rewind = EMiniDisplayIconRewind,
+        Forward = EMiniDisplayIconForward,
+        Dvd = EMiniDisplayIconDvd,
+        Cd = EMiniDisplayIconCd,
+        Vcd = EMiniDisplayIconVcd
     };
 
     //TODO: get proper definition
@@ -41,7 +46,8 @@ namespace SharpLib::MiniDisplay
         AutoDetect = EMiniDisplayAutoDetect,
         FutabaGP1212A01 = EMiniDisplayFutabaGP1212A01,
         FutabaGP1212A02 = EMiniDisplayFutabaGP1212A02,
-        FutabaMDM166AA = EMiniDisplayFutabaMDM166AA,
+        FutabaMDM140AA = EMiniDisplayFutabaMDM140AA,
+        FutabaMDM166AA = EMiniDisplayFutabaMDM166AA,        
         NoritakeGU256X64D39XX = EMiniDisplayNoritakeGU256X64D39XX
     };
 
